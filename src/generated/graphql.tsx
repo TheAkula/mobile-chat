@@ -1,0 +1,402 @@
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+const defaultOptions = {} as const;
+/** All built-in and custom scalars, mapped to their actual values */
+export type Scalars = {
+  ID: string;
+  String: string;
+  Boolean: boolean;
+  Int: number;
+  Float: number;
+  DateTime: any;
+};
+
+export type Auth = {
+  __typename?: 'Auth';
+  userToken: Scalars['String'];
+};
+
+export type Chat = {
+  __typename?: 'Chat';
+  friend?: Maybe<UserLink>;
+  id: Scalars['String'];
+  imgUrl?: Maybe<Scalars['String']>;
+  isFriendsChat: Scalars['Boolean'];
+  messages: Array<MessageLink>;
+  name?: Maybe<Scalars['String']>;
+  users: Array<UserLink>;
+};
+
+export type ChatLink = {
+  __typename?: 'ChatLink';
+  id: Scalars['String'];
+  imgUrl?: Maybe<Scalars['String']>;
+  isFriendsChat: Scalars['Boolean'];
+  name?: Maybe<Scalars['String']>;
+};
+
+export type Invitation = {
+  __typename?: 'Invitation';
+  chat?: Maybe<Chat>;
+  id: Scalars['String'];
+  receiver: UserLink;
+  sender: UserLink;
+  status: Scalars['String'];
+  type: Scalars['String'];
+};
+
+export type Message = {
+  __typename?: 'Message';
+  author: UserLink;
+  chat: ChatLink;
+  content: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type MessageLink = {
+  __typename?: 'MessageLink';
+  content: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  addFriend: User;
+  confirmSignUpWith2fa: User;
+  createChat: Chat;
+  createMessage: Message;
+  inviteToChat: Invitation;
+  inviteToFriends: Invitation;
+  login: Auth;
+  signUp: User;
+  signUpWith2fa: TwoFactorAuth;
+  updateUser: User;
+};
+
+
+export type MutationConfirmSignUpWith2faArgs = {
+  code: Scalars['Float'];
+  counter: Scalars['Float'];
+};
+
+
+export type MutationCreateChatArgs = {
+  id?: InputMaybe<Scalars['String']>;
+  isFriendsChat?: InputMaybe<Scalars['Boolean']>;
+  name?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationCreateMessageArgs = {
+  chatId: Scalars['String'];
+  content: Scalars['String'];
+};
+
+
+export type MutationInviteToChatArgs = {
+  receiverId: Scalars['String'];
+};
+
+
+export type MutationInviteToFriendsArgs = {
+  receiverId: Scalars['String'];
+};
+
+
+export type MutationLoginArgs = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
+
+export type MutationSignUpArgs = {
+  email: Scalars['String'];
+  firstName: Scalars['String'];
+  lastName: Scalars['String'];
+  password: Scalars['String'];
+};
+
+
+export type MutationSignUpWith2faArgs = {
+  email: Scalars['String'];
+};
+
+
+export type MutationUpdateUserArgs = {
+  avatar?: InputMaybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']>;
+  firstName?: InputMaybe<Scalars['String']>;
+  lastName?: InputMaybe<Scalars['String']>;
+};
+
+export type Notification = {
+  __typename?: 'Notification';
+  description?: Maybe<Scalars['String']>;
+  imgUrl?: Maybe<Scalars['String']>;
+  invitaiton?: Maybe<Invitation>;
+  isRead: Scalars['Boolean'];
+  owner: User;
+  title?: Maybe<Scalars['String']>;
+  type: Scalars['String'];
+};
+
+export type Query = {
+  __typename?: 'Query';
+  mainChats: Array<Chat>;
+  messages: Array<Message>;
+  myFriends: Array<User>;
+  myNotifications: Array<Notification>;
+  myUserInfo: User;
+  user: User;
+};
+
+
+export type QueryMessagesArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryUserArgs = {
+  id: Scalars['String'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  chatCreated: Chat;
+  messageCreated?: Maybe<Message>;
+};
+
+
+export type SubscriptionChatCreatedArgs = {
+  userId: Scalars['String'];
+};
+
+
+export type SubscriptionMessageCreatedArgs = {
+  userId: Scalars['String'];
+};
+
+export type TwoFactorAuth = {
+  __typename?: 'TwoFactorAuth';
+  counter: Scalars['Float'];
+  userToken: Scalars['String'];
+};
+
+export type User = {
+  __typename?: 'User';
+  avatar?: Maybe<Scalars['String']>;
+  chats: Array<ChatLink>;
+  email: Scalars['String'];
+  firstName?: Maybe<Scalars['String']>;
+  friends: Array<UserLink>;
+  haveProfile: Scalars['Boolean'];
+  id: Scalars['String'];
+  invitations: Array<Invitation>;
+  isActive: Scalars['Boolean'];
+  isAuthenticated: Scalars['Boolean'];
+  lastName?: Maybe<Scalars['String']>;
+  myInvitations: Array<Invitation>;
+  notifications: Array<Notification>;
+  userToken?: Maybe<Scalars['String']>;
+};
+
+export type UserLink = {
+  __typename?: 'UserLink';
+  avatar?: Maybe<Scalars['String']>;
+  email: Scalars['String'];
+  firstName?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  isActive: Scalars['Boolean'];
+  lastName?: Maybe<Scalars['String']>;
+};
+
+export type ConfirmSignUpWith2faMutationVariables = Exact<{
+  code: Scalars['Float'];
+  counter: Scalars['Float'];
+}>;
+
+
+export type ConfirmSignUpWith2faMutation = { __typename?: 'Mutation', confirmSignUpWith2fa: { __typename?: 'User', id: string, haveProfile: boolean, userToken?: string | null } };
+
+export type CreateProfileMutationVariables = Exact<{
+  firstName?: InputMaybe<Scalars['String']>;
+  lastName?: InputMaybe<Scalars['String']>;
+  avatar?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type CreateProfileMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, email: string, haveProfile: boolean, isAuthenticated: boolean } };
+
+export type MyInfoQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyInfoQuery = { __typename?: 'Query', myUserInfo: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, email: string, avatar?: string | null, isAuthenticated: boolean, haveProfile: boolean } };
+
+export type SignUpWith2faMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type SignUpWith2faMutation = { __typename?: 'Mutation', signUpWith2fa: { __typename?: 'TwoFactorAuth', userToken: string, counter: number } };
+
+
+export const ConfirmSignUpWith2faDocument = gql`
+    mutation confirmSignUpWith2fa($code: Float!, $counter: Float!) {
+  confirmSignUpWith2fa(code: $code, counter: $counter) {
+    id
+    haveProfile
+    userToken
+  }
+}
+    `;
+export type ConfirmSignUpWith2faMutationFn = Apollo.MutationFunction<ConfirmSignUpWith2faMutation, ConfirmSignUpWith2faMutationVariables>;
+
+/**
+ * __useConfirmSignUpWith2faMutation__
+ *
+ * To run a mutation, you first call `useConfirmSignUpWith2faMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmSignUpWith2faMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [confirmSignUpWith2faMutation, { data, loading, error }] = useConfirmSignUpWith2faMutation({
+ *   variables: {
+ *      code: // value for 'code'
+ *      counter: // value for 'counter'
+ *   },
+ * });
+ */
+export function useConfirmSignUpWith2faMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmSignUpWith2faMutation, ConfirmSignUpWith2faMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ConfirmSignUpWith2faMutation, ConfirmSignUpWith2faMutationVariables>(ConfirmSignUpWith2faDocument, options);
+      }
+export type ConfirmSignUpWith2faMutationHookResult = ReturnType<typeof useConfirmSignUpWith2faMutation>;
+export type ConfirmSignUpWith2faMutationResult = Apollo.MutationResult<ConfirmSignUpWith2faMutation>;
+export type ConfirmSignUpWith2faMutationOptions = Apollo.BaseMutationOptions<ConfirmSignUpWith2faMutation, ConfirmSignUpWith2faMutationVariables>;
+export const CreateProfileDocument = gql`
+    mutation createProfile($firstName: String, $lastName: String, $avatar: String) {
+  updateUser(firstName: $firstName, lastName: $lastName, avatar: $avatar) {
+    id
+    firstName
+    lastName
+    avatar
+    email
+    haveProfile
+    isAuthenticated
+  }
+}
+    `;
+export type CreateProfileMutationFn = Apollo.MutationFunction<CreateProfileMutation, CreateProfileMutationVariables>;
+
+/**
+ * __useCreateProfileMutation__
+ *
+ * To run a mutation, you first call `useCreateProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createProfileMutation, { data, loading, error }] = useCreateProfileMutation({
+ *   variables: {
+ *      firstName: // value for 'firstName'
+ *      lastName: // value for 'lastName'
+ *      avatar: // value for 'avatar'
+ *   },
+ * });
+ */
+export function useCreateProfileMutation(baseOptions?: Apollo.MutationHookOptions<CreateProfileMutation, CreateProfileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateProfileMutation, CreateProfileMutationVariables>(CreateProfileDocument, options);
+      }
+export type CreateProfileMutationHookResult = ReturnType<typeof useCreateProfileMutation>;
+export type CreateProfileMutationResult = Apollo.MutationResult<CreateProfileMutation>;
+export type CreateProfileMutationOptions = Apollo.BaseMutationOptions<CreateProfileMutation, CreateProfileMutationVariables>;
+export const MyInfoDocument = gql`
+    query myInfo {
+  myUserInfo {
+    id
+    firstName
+    lastName
+    email
+    avatar
+    isAuthenticated
+    haveProfile
+  }
+}
+    `;
+
+/**
+ * __useMyInfoQuery__
+ *
+ * To run a query within a React component, call `useMyInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyInfoQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyInfoQuery(baseOptions?: Apollo.QueryHookOptions<MyInfoQuery, MyInfoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MyInfoQuery, MyInfoQueryVariables>(MyInfoDocument, options);
+      }
+export function useMyInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyInfoQuery, MyInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MyInfoQuery, MyInfoQueryVariables>(MyInfoDocument, options);
+        }
+export type MyInfoQueryHookResult = ReturnType<typeof useMyInfoQuery>;
+export type MyInfoLazyQueryHookResult = ReturnType<typeof useMyInfoLazyQuery>;
+export type MyInfoQueryResult = Apollo.QueryResult<MyInfoQuery, MyInfoQueryVariables>;
+export const SignUpWith2faDocument = gql`
+    mutation signUpWith2fa($email: String!) {
+  signUpWith2fa(email: $email) {
+    userToken
+    counter
+  }
+}
+    `;
+export type SignUpWith2faMutationFn = Apollo.MutationFunction<SignUpWith2faMutation, SignUpWith2faMutationVariables>;
+
+/**
+ * __useSignUpWith2faMutation__
+ *
+ * To run a mutation, you first call `useSignUpWith2faMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignUpWith2faMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [signUpWith2faMutation, { data, loading, error }] = useSignUpWith2faMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useSignUpWith2faMutation(baseOptions?: Apollo.MutationHookOptions<SignUpWith2faMutation, SignUpWith2faMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SignUpWith2faMutation, SignUpWith2faMutationVariables>(SignUpWith2faDocument, options);
+      }
+export type SignUpWith2faMutationHookResult = ReturnType<typeof useSignUpWith2faMutation>;
+export type SignUpWith2faMutationResult = Apollo.MutationResult<SignUpWith2faMutation>;
+export type SignUpWith2faMutationOptions = Apollo.BaseMutationOptions<SignUpWith2faMutation, SignUpWith2faMutationVariables>;

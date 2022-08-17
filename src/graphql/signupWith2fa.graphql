@@ -1,0 +1,6 @@
+mutation signUpWith2fa($email: String!) {
+  signUpWith2fa(email: $email) {
+    userToken
+    counter
+  }
+}

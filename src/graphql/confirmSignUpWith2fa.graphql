@@ -1,0 +1,7 @@
+mutation confirmSignUpWith2fa($code: Float!, $counter: Float!) {
+  confirmSignUpWith2fa(code: $code, counter: $counter) {
+    id
+    haveProfile
+    userToken
+  }
+}

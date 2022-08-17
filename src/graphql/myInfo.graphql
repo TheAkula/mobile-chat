@@ -1,0 +1,11 @@
+query myInfo {
+  myUserInfo {
+    id
+    firstName
+    lastName
+    email
+    avatar
+    isAuthenticated
+    haveProfile
+  }
+}

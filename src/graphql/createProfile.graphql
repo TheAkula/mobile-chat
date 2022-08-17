@@ -1,0 +1,11 @@
+mutation createProfile($firstName: String, $lastName: String, $avatar: String) {
+  updateUser(firstName: $firstName, lastName: $lastName, avatar: $avatar) {
+    id
+    firstName
+    lastName
+    avatar
+    email
+    haveProfile
+    isAuthenticated
+  }
+}
