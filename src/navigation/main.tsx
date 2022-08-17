@@ -1,20 +1,17 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useRoute } from "@react-navigation/native";
-import { StackScreenProps } from "@react-navigation/stack";
 import {
   TabBarButton,
   Chats as ChatsIcon,
   MessageCircle,
+  MoreHorizontal,
 } from "src/components";
-import { Chats, Contacts } from "src/screens";
+import { Chats, Contacts, More } from "src/screens";
 import { AppTheme } from "src/theme";
-import { MainParamList, MainRoute, RootParamList, RootRoute } from "./types";
-
-type Props = StackScreenProps<RootParamList, RootRoute.Main>;
+import { MainParamList, MainRoute } from "./types";
 
 const Tab = createBottomTabNavigator<MainParamList>();
 
-export const Main = ({ route }: Props) => {
+export const Main = () => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -26,21 +23,6 @@ export const Main = ({ route }: Props) => {
       }}
     >
       <Tab.Screen
-        name={MainRoute.Chats}
-        component={Chats}
-        options={({ navigation }) => ({
-          tabBarButton: (props) => (
-            <TabBarButton
-              title="Chats"
-              {...props}
-              active={navigation.isFocused()}
-            >
-              <ChatsIcon />
-            </TabBarButton>
-          ),
-        })}
-      />
-      <Tab.Screen
         name={MainRoute.Contacts}
         component={Contacts}
         options={({ navigation }) => ({
@@ -50,7 +32,37 @@ export const Main = ({ route }: Props) => {
               {...props}
               active={navigation.isFocused()}
             >
+              <ChatsIcon />
+            </TabBarButton>
+          ),
+        })}
+      />
+      <Tab.Screen
+        name={MainRoute.Chats}
+        component={Chats}
+        options={({ navigation }) => ({
+          tabBarButton: (props) => (
+            <TabBarButton
+              title="Chats"
+              {...props}
+              active={navigation.isFocused()}
+            >
               <MessageCircle color={AppTheme.colors.white[0]} />
+            </TabBarButton>
+          ),
+        })}
+      />
+      <Tab.Screen
+        name={MainRoute.More}
+        component={More}
+        options={({ navigation }) => ({
+          tabBarButton: (props) => (
+            <TabBarButton
+              title="More"
+              {...props}
+              active={navigation.isFocused()}
+            >
+              <MoreHorizontal color={AppTheme.colors.white[0]} />
             </TabBarButton>
           ),
         })}
