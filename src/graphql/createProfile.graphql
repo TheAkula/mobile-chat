@@ -1,5 +1,15 @@
-mutation createProfile($firstName: String, $lastName: String, $avatar: String) {
-  updateUser(firstName: $firstName, lastName: $lastName, avatar: $avatar) {
+mutation createProfile(
+  $firstName: String
+  $lastName: String
+  $avatar: String
+  $avatarExt: String
+) {
+  updateUser(
+    firstName: $firstName
+    lastName: $lastName
+    avatar: $avatar
+    avatarExt: $avatarExt
+  ) {
     id
     firstName
     lastName

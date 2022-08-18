@@ -133,6 +133,7 @@ export type MutationSignUpWith2faArgs = {
 
 export type MutationUpdateUserArgs = {
   avatar?: InputMaybe<Scalars['String']>;
+  avatarExt?: InputMaybe<Scalars['String']>;
   email?: InputMaybe<Scalars['String']>;
   firstName?: InputMaybe<Scalars['String']>;
   lastName?: InputMaybe<Scalars['String']>;
@@ -204,6 +205,7 @@ export type User = {
   isActive: Scalars['Boolean'];
   isAuthenticated: Scalars['Boolean'];
   lastName?: Maybe<Scalars['String']>;
+  lastSeen: Scalars['String'];
   myInvitations: Array<Invitation>;
   notifications: Array<Notification>;
   userToken?: Maybe<Scalars['String']>;
@@ -227,10 +229,16 @@ export type ConfirmSignUpWith2faMutationVariables = Exact<{
 
 export type ConfirmSignUpWith2faMutation = { __typename?: 'Mutation', confirmSignUpWith2fa: { __typename?: 'User', id: string, haveProfile: boolean, userToken?: string | null } };
 
+export type ContactsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ContactsQuery = { __typename?: 'Query', myFriends: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, isActive: boolean, avatar?: string | null }> };
+
 export type CreateProfileMutationVariables = Exact<{
   firstName?: InputMaybe<Scalars['String']>;
   lastName?: InputMaybe<Scalars['String']>;
   avatar?: InputMaybe<Scalars['String']>;
+  avatarExt?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -285,9 +293,52 @@ export function useConfirmSignUpWith2faMutation(baseOptions?: Apollo.MutationHoo
 export type ConfirmSignUpWith2faMutationHookResult = ReturnType<typeof useConfirmSignUpWith2faMutation>;
 export type ConfirmSignUpWith2faMutationResult = Apollo.MutationResult<ConfirmSignUpWith2faMutation>;
 export type ConfirmSignUpWith2faMutationOptions = Apollo.BaseMutationOptions<ConfirmSignUpWith2faMutation, ConfirmSignUpWith2faMutationVariables>;
+export const ContactsDocument = gql`
+    query contacts {
+  myFriends {
+    id
+    firstName
+    lastName
+    isActive
+    avatar
+  }
+}
+    `;
+
+/**
+ * __useContactsQuery__
+ *
+ * To run a query within a React component, call `useContactsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContactsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useContactsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useContactsQuery(baseOptions?: Apollo.QueryHookOptions<ContactsQuery, ContactsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ContactsQuery, ContactsQueryVariables>(ContactsDocument, options);
+      }
+export function useContactsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ContactsQuery, ContactsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ContactsQuery, ContactsQueryVariables>(ContactsDocument, options);
+        }
+export type ContactsQueryHookResult = ReturnType<typeof useContactsQuery>;
+export type ContactsLazyQueryHookResult = ReturnType<typeof useContactsLazyQuery>;
+export type ContactsQueryResult = Apollo.QueryResult<ContactsQuery, ContactsQueryVariables>;
 export const CreateProfileDocument = gql`
-    mutation createProfile($firstName: String, $lastName: String, $avatar: String) {
-  updateUser(firstName: $firstName, lastName: $lastName, avatar: $avatar) {
+    mutation createProfile($firstName: String, $lastName: String, $avatar: String, $avatarExt: String) {
+  updateUser(
+    firstName: $firstName
+    lastName: $lastName
+    avatar: $avatar
+    avatarExt: $avatarExt
+  ) {
     id
     firstName
     lastName
@@ -316,6 +367,7 @@ export type CreateProfileMutationFn = Apollo.MutationFunction<CreateProfileMutat
  *      firstName: // value for 'firstName'
  *      lastName: // value for 'lastName'
  *      avatar: // value for 'avatar'
+ *      avatarExt: // value for 'avatarExt'
  *   },
  * });
  */

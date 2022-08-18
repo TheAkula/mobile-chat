@@ -19,8 +19,6 @@ $user
   .on(updateProfileFx.doneData, (prev, newUser) => {
     const responseData = newUser.data?.updateUser;
 
-    console.log(responseData, newUser);
-
     if (prev) {
       return {
         ...prev,

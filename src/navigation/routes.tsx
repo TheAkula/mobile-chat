@@ -46,8 +46,8 @@ export const Routes = () => {
         backgroundColor={AppTheme.colors.blue[7]}
       />
       <RootStack.Navigator
+        initialRouteName={RootRoute.Auth}
         screenOptions={{
-          // header: () => <Header back />,
           headerBackImage: () => <Chevron />,
           headerTitle: ({ children }) => <Text>{children}</Text>,
           headerStyle: {

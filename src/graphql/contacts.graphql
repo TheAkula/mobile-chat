@@ -1,0 +1,9 @@
+query contacts {
+  myFriends {
+    id
+    firstName
+    lastName
+    isActive
+    avatar
+  }
+}

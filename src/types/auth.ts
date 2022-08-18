@@ -3,7 +3,6 @@ export interface AuthEmailForm {
 }
 
 export interface AuthProfileForm {
-  img?: string;
   firstName: string;
   lastName?: string;
 }

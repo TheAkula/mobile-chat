@@ -1,5 +1,9 @@
 import { Image, Text, View } from "react-native";
-import { launchImageLibraryAsync, MediaTypeOptions } from "expo-image-picker";
+import {
+  ImageInfo,
+  launchImageLibraryAsync,
+  MediaTypeOptions,
+} from "expo-image-picker";
 import styled from "styled-components/native";
 import { Plus, Avatar, Input, Container, Button } from "src/components";
 import { useState } from "react";
@@ -29,24 +33,26 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
   const {
     control,
     handleSubmit,
+    setValue,
+    getValues,
     formState: { isValid },
   } = useForm<AuthProfileForm>({
     resolver: yupResolver(authProfile),
-    mode: "all",
+    mode: "onChange",
   });
   const updateProfile = useUpdateProfile();
-  const [imgUri, setImgUri] = useState<string | null>(null);
-  const { $user } = useUserStore();
+  const [img, setImg] = useState<ImageInfo | null>(null);
   const handlePress = async () => {
     const img = await launchImageLibraryAsync({
       mediaTypes: MediaTypeOptions.Images,
+      base64: true,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
 
     if (img.cancelled === false) {
-      setImgUri(img.uri);
+      setImg(img);
     }
   };
 
@@ -54,20 +60,20 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
     await updateProfile({
       firstName: data.firstName,
       lastName: data.lastName,
-      avatar: data.img,
+      avatar: img?.base64,
+      avatarExt: img?.uri.slice(img?.uri.lastIndexOf(".") + 1),
     });
-    console.log($user);
   };
 
   return (
     <AuthContainer>
       <ProfileContainer>
-        <ImagePickerContainer onPress={handlePress} hasImage={!!imgUri}>
-          {imgUri ? (
-            <Image source={{ uri: imgUri, width: 100, height: 100 }} />
+        <ImagePickerContainer onPress={handlePress} hasImage={!!img?.uri}>
+          {img?.uri ? (
+            <Image source={{ uri: img.uri, width: 100, height: 100 }} />
           ) : (
             <>
-              <Avatar />
+              <Avatar width={56} height={56} />
               <ImagePickerPlus>
                 <Plus />
               </ImagePickerPlus>
