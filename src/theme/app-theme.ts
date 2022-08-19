@@ -12,8 +12,6 @@ export const AppTheme = {
     superSmall: "10px",
   },
   lineHeights: {
-    large: "auto",
-    big: "auto",
     semiBig: "30px",
     medium: "28px",
     normal: "24px",

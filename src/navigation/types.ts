@@ -9,6 +9,9 @@ export enum AuthRoute {
   AuthPhone = "AuthPhone",
   AuthCode = "AuthCode",
   AuthProfile = "AuthProfile",
+  AuthWelcome = "AuthWelcome",
+  AuthSignIn = "AuthSignIn",
+  AuthPassword = "AuthPassword",
 }
 
 export enum MainRoute {
@@ -26,6 +29,9 @@ export type AuthParamList = {
   [AuthRoute.AuthPhone]: undefined;
   [AuthRoute.AuthCode]: { email: string; counter: number };
   [AuthRoute.AuthProfile]: undefined;
+  [AuthRoute.AuthWelcome]: undefined;
+  [AuthRoute.AuthSignIn]: undefined;
+  [AuthRoute.AuthPassword]: undefined;
 };
 
 export type MainParamList = {

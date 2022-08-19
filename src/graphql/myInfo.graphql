@@ -5,7 +5,6 @@ query myInfo {
     lastName
     email
     avatar
-    isAuthenticated
-    haveProfile
+    authStatus
   }
 }

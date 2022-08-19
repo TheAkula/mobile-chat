@@ -1,4 +1,4 @@
-import { Image, Text, View } from "react-native";
+import { Image } from "react-native";
 import {
   ImageInfo,
   launchImageLibraryAsync,
@@ -12,13 +12,12 @@ import { AuthProfileForm } from "src/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { authProfile } from "src/utils";
 import { AuthContainer, ButtonContainer } from "./styles";
-import { useUpdateProfile, useUserStore } from "src/models";
+import { useUpdateProfile } from "src/models";
 import { StackScreenProps } from "@react-navigation/stack";
 import { CompositeScreenProps } from "@react-navigation/native";
 import {
   AuthParamList,
   AuthRoute,
-  MainRoute,
   RootParamList,
   RootRoute,
 } from "src/navigation/types";
@@ -33,8 +32,6 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
   const {
     control,
     handleSubmit,
-    setValue,
-    getValues,
     formState: { isValid },
   } = useForm<AuthProfileForm>({
     resolver: yupResolver(authProfile),
@@ -63,6 +60,7 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
       avatar: img?.base64,
       avatarExt: img?.uri.slice(img?.uri.lastIndexOf(".") + 1),
     });
+    navigate(AuthRoute.AuthPassword);
   };
 
   return (

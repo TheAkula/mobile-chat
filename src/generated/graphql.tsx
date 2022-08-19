@@ -21,6 +21,13 @@ export type Auth = {
   userToken: Scalars['String'];
 };
 
+export enum AuthStatus {
+  Authenticated = 'Authenticated',
+  HaveAccount = 'HaveAccount',
+  HaveProfile = 'HaveProfile',
+  NotAuthenticated = 'NotAuthenticated'
+}
+
 export type Chat = {
   __typename?: 'Chat';
   friend?: Maybe<UserLink>;
@@ -137,6 +144,7 @@ export type MutationUpdateUserArgs = {
   email?: InputMaybe<Scalars['String']>;
   firstName?: InputMaybe<Scalars['String']>;
   lastName?: InputMaybe<Scalars['String']>;
+  password?: InputMaybe<Scalars['String']>;
 };
 
 export type Notification = {
@@ -194,16 +202,15 @@ export type TwoFactorAuth = {
 
 export type User = {
   __typename?: 'User';
+  authStatus: AuthStatus;
   avatar?: Maybe<Scalars['String']>;
   chats: Array<ChatLink>;
   email: Scalars['String'];
   firstName?: Maybe<Scalars['String']>;
   friends: Array<UserLink>;
-  haveProfile: Scalars['Boolean'];
   id: Scalars['String'];
   invitations: Array<Invitation>;
   isActive: Scalars['Boolean'];
-  isAuthenticated: Scalars['Boolean'];
   lastName?: Maybe<Scalars['String']>;
   lastSeen: Scalars['String'];
   myInvitations: Array<Invitation>;
@@ -227,27 +234,25 @@ export type ConfirmSignUpWith2faMutationVariables = Exact<{
 }>;
 
 
-export type ConfirmSignUpWith2faMutation = { __typename?: 'Mutation', confirmSignUpWith2fa: { __typename?: 'User', id: string, haveProfile: boolean, userToken?: string | null } };
+export type ConfirmSignUpWith2faMutation = { __typename?: 'Mutation', confirmSignUpWith2fa: { __typename?: 'User', userToken?: string | null } };
 
 export type ContactsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ContactsQuery = { __typename?: 'Query', myFriends: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, isActive: boolean, avatar?: string | null }> };
-
-export type CreateProfileMutationVariables = Exact<{
-  firstName?: InputMaybe<Scalars['String']>;
-  lastName?: InputMaybe<Scalars['String']>;
-  avatar?: InputMaybe<Scalars['String']>;
-  avatarExt?: InputMaybe<Scalars['String']>;
-}>;
-
-
-export type CreateProfileMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, email: string, haveProfile: boolean, isAuthenticated: boolean } };
+export type ContactsQuery = { __typename?: 'Query', myFriends: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, authStatus: AuthStatus, avatar?: string | null }> };
 
 export type MyInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyInfoQuery = { __typename?: 'Query', myUserInfo: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, email: string, avatar?: string | null, isAuthenticated: boolean, haveProfile: boolean } };
+export type MyInfoQuery = { __typename?: 'Query', myUserInfo: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, email: string, avatar?: string | null, authStatus: AuthStatus } };
+
+export type SigninMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type SigninMutation = { __typename?: 'Mutation', login: { __typename?: 'Auth', userToken: string } };
 
 export type SignUpWith2faMutationVariables = Exact<{
   email: Scalars['String'];
@@ -256,12 +261,21 @@ export type SignUpWith2faMutationVariables = Exact<{
 
 export type SignUpWith2faMutation = { __typename?: 'Mutation', signUpWith2fa: { __typename?: 'TwoFactorAuth', userToken: string, counter: number } };
 
+export type UpdateProfileMutationVariables = Exact<{
+  firstName?: InputMaybe<Scalars['String']>;
+  lastName?: InputMaybe<Scalars['String']>;
+  avatar?: InputMaybe<Scalars['String']>;
+  avatarExt?: InputMaybe<Scalars['String']>;
+  password?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, email: string, authStatus: AuthStatus } };
+
 
 export const ConfirmSignUpWith2faDocument = gql`
     mutation confirmSignUpWith2fa($code: Float!, $counter: Float!) {
   confirmSignUpWith2fa(code: $code, counter: $counter) {
-    id
-    haveProfile
     userToken
   }
 }
@@ -299,7 +313,7 @@ export const ContactsDocument = gql`
     id
     firstName
     lastName
-    isActive
+    authStatus
     avatar
   }
 }
@@ -331,53 +345,6 @@ export function useContactsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<C
 export type ContactsQueryHookResult = ReturnType<typeof useContactsQuery>;
 export type ContactsLazyQueryHookResult = ReturnType<typeof useContactsLazyQuery>;
 export type ContactsQueryResult = Apollo.QueryResult<ContactsQuery, ContactsQueryVariables>;
-export const CreateProfileDocument = gql`
-    mutation createProfile($firstName: String, $lastName: String, $avatar: String, $avatarExt: String) {
-  updateUser(
-    firstName: $firstName
-    lastName: $lastName
-    avatar: $avatar
-    avatarExt: $avatarExt
-  ) {
-    id
-    firstName
-    lastName
-    avatar
-    email
-    haveProfile
-    isAuthenticated
-  }
-}
-    `;
-export type CreateProfileMutationFn = Apollo.MutationFunction<CreateProfileMutation, CreateProfileMutationVariables>;
-
-/**
- * __useCreateProfileMutation__
- *
- * To run a mutation, you first call `useCreateProfileMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateProfileMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createProfileMutation, { data, loading, error }] = useCreateProfileMutation({
- *   variables: {
- *      firstName: // value for 'firstName'
- *      lastName: // value for 'lastName'
- *      avatar: // value for 'avatar'
- *      avatarExt: // value for 'avatarExt'
- *   },
- * });
- */
-export function useCreateProfileMutation(baseOptions?: Apollo.MutationHookOptions<CreateProfileMutation, CreateProfileMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateProfileMutation, CreateProfileMutationVariables>(CreateProfileDocument, options);
-      }
-export type CreateProfileMutationHookResult = ReturnType<typeof useCreateProfileMutation>;
-export type CreateProfileMutationResult = Apollo.MutationResult<CreateProfileMutation>;
-export type CreateProfileMutationOptions = Apollo.BaseMutationOptions<CreateProfileMutation, CreateProfileMutationVariables>;
 export const MyInfoDocument = gql`
     query myInfo {
   myUserInfo {
@@ -386,8 +353,7 @@ export const MyInfoDocument = gql`
     lastName
     email
     avatar
-    isAuthenticated
-    haveProfile
+    authStatus
   }
 }
     `;
@@ -418,6 +384,40 @@ export function useMyInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyI
 export type MyInfoQueryHookResult = ReturnType<typeof useMyInfoQuery>;
 export type MyInfoLazyQueryHookResult = ReturnType<typeof useMyInfoLazyQuery>;
 export type MyInfoQueryResult = Apollo.QueryResult<MyInfoQuery, MyInfoQueryVariables>;
+export const SigninDocument = gql`
+    mutation signin($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    userToken
+  }
+}
+    `;
+export type SigninMutationFn = Apollo.MutationFunction<SigninMutation, SigninMutationVariables>;
+
+/**
+ * __useSigninMutation__
+ *
+ * To run a mutation, you first call `useSigninMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSigninMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [signinMutation, { data, loading, error }] = useSigninMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useSigninMutation(baseOptions?: Apollo.MutationHookOptions<SigninMutation, SigninMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SigninMutation, SigninMutationVariables>(SigninDocument, options);
+      }
+export type SigninMutationHookResult = ReturnType<typeof useSigninMutation>;
+export type SigninMutationResult = Apollo.MutationResult<SigninMutation>;
+export type SigninMutationOptions = Apollo.BaseMutationOptions<SigninMutation, SigninMutationVariables>;
 export const SignUpWith2faDocument = gql`
     mutation signUpWith2fa($email: String!) {
   signUpWith2fa(email: $email) {
@@ -452,3 +452,51 @@ export function useSignUpWith2faMutation(baseOptions?: Apollo.MutationHookOption
 export type SignUpWith2faMutationHookResult = ReturnType<typeof useSignUpWith2faMutation>;
 export type SignUpWith2faMutationResult = Apollo.MutationResult<SignUpWith2faMutation>;
 export type SignUpWith2faMutationOptions = Apollo.BaseMutationOptions<SignUpWith2faMutation, SignUpWith2faMutationVariables>;
+export const UpdateProfileDocument = gql`
+    mutation updateProfile($firstName: String, $lastName: String, $avatar: String, $avatarExt: String, $password: String) {
+  updateUser(
+    firstName: $firstName
+    lastName: $lastName
+    avatar: $avatar
+    avatarExt: $avatarExt
+    password: $password
+  ) {
+    id
+    firstName
+    lastName
+    avatar
+    email
+    authStatus
+  }
+}
+    `;
+export type UpdateProfileMutationFn = Apollo.MutationFunction<UpdateProfileMutation, UpdateProfileMutationVariables>;
+
+/**
+ * __useUpdateProfileMutation__
+ *
+ * To run a mutation, you first call `useUpdateProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProfileMutation, { data, loading, error }] = useUpdateProfileMutation({
+ *   variables: {
+ *      firstName: // value for 'firstName'
+ *      lastName: // value for 'lastName'
+ *      avatar: // value for 'avatar'
+ *      avatarExt: // value for 'avatarExt'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOptions<UpdateProfileMutation, UpdateProfileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateProfileMutation, UpdateProfileMutationVariables>(UpdateProfileDocument, options);
+      }
+export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
+export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
+export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;

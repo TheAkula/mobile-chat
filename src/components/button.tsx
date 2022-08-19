@@ -59,10 +59,10 @@ const StyledText = styled.Text<Props>`
         color: ${theme.colors.white[0]};
       `,
       secondary: css`
-        color: ${theme.colors.blue[1]};
+        color: ${theme.colors.blue[2]};
       `,
       ghost: css`
-        color: ${theme.colors.blue[1]};
+        color: ${theme.colors.blue[2]};
       `,
     })}
 `;
@@ -79,15 +79,14 @@ const StyledButton = styled.Pressable<Props>`
   ${({ theme }) =>
     switchProp("variant", {
       primary: css`
-        background-color: ${theme.colors.blue[1]};
-        border-color: ${theme.colors.blue[1]};
+        background-color: ${theme.colors.blue[2]};
+        border-color: ${theme.colors.blue[2]};
         ${switchProp("status", {
           hover: css`
             background-color: ${theme.colors.blue[0]};
             border-color: ${theme.colors.blue[0]};
           `,
           focus: css`
-            /* box-shadow: 0 0 8px 8px ${theme.colors.blue[4]}; */
             shadow-color: ${theme.colors.white[4]};
             shadow-radius: 8px;
           `,
@@ -98,7 +97,7 @@ const StyledButton = styled.Pressable<Props>`
       `,
       secondary: css`
         background-color: ${theme.colors.transparent};
-        border-color: ${theme.colors.blue[1]};
+        border-color: ${theme.colors.blue[2]};
         ${switchProp("status", {
           hover: css`
             background-color: ${theme.colors.blue[0]};
@@ -107,7 +106,6 @@ const StyledButton = styled.Pressable<Props>`
           `,
           focus: css`
             border-width: 1px;
-            /* box-shadow: 0 0 8px 8px ${theme.colors.white[0]}; */
             shadow-color: ${theme.colors.white[0]};
             shadow-radius: 8px;
           `,
@@ -126,7 +124,6 @@ const StyledButton = styled.Pressable<Props>`
             color: ${theme.colors.blue[0]};
           `,
           focus: css`
-            /* box-shadow: 0 0 8px 8px ${theme.colors.white[0]}; */
             shadow-color: ${theme.colors.white[0]};
             shadow-radius: 8px;
             background-color: ${theme.colors.white[1]};

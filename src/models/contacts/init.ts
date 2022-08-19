@@ -1,7 +1,10 @@
-import { myContactsFx, $myContacts, $myContactsLoading } from ".";
+import { fetchMyContactsFx, $myContacts, $myContactsLoading } from ".";
 
-$myContacts.on(myContactsFx.doneData, (_, contacts) => contacts.data.myFriends);
+$myContacts.on(
+  fetchMyContactsFx.doneData,
+  (_, contacts) => contacts.data.myFriends
+);
 
 $myContactsLoading
-  .on(myContactsFx.pending, () => true)
-  .on(myContactsFx.finally, () => false);
+  .on(fetchMyContactsFx.pending, () => true)
+  .on(fetchMyContactsFx.finally, () => false);

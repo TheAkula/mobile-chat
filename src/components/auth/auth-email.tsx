@@ -13,20 +13,17 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { authPhone } from "src/utils";
 import { AuthEmailForm } from "src/types";
-import { useSignUpWith2faMutation } from "src/generated/graphql";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AsyncStorageKey } from "src/constants";
+import { useSignupWith2fa } from "src/models";
 
 type Props = StackScreenProps<AuthParamList, AuthRoute.AuthPhone>;
 
 export const AuthEmail = ({ navigation }: Props) => {
-  const [signUpWith2faMutation] = useSignUpWith2faMutation();
+  const signupWith2fa = useSignupWith2fa();
   const { push } = navigation;
   const {
     control,
     handleSubmit,
-    getValues,
-    formState: { isValid, errors },
+    formState: { isValid },
   } = useForm<AuthEmailForm>({
     resolver: yupResolver(authPhone),
     mode: "onChange",
@@ -36,25 +33,11 @@ export const AuthEmail = ({ navigation }: Props) => {
     },
   });
 
-  const onSubmit = (data: AuthEmailForm) => {
-    signUpWith2faMutation({
-      variables: {
-        email: data.email,
-      },
-      onError(err) {
-        console.log(err);
-      },
-      async onCompleted(complData) {
-        await AsyncStorage.setItem(
-          AsyncStorageKey.USER_TOKEN,
-          complData.signUpWith2fa.userToken
-        );
-
-        push(AuthRoute.AuthCode, {
-          email: data.email,
-          counter: complData.signUpWith2fa.counter,
-        });
-      },
+  const onSubmit = async (data: AuthEmailForm) => {
+    const response = await signupWith2fa({ email: data.email });
+    push(AuthRoute.AuthCode, {
+      email: data.email,
+      counter: response.data?.signUpWith2fa.counter || 0,
     });
   };
 

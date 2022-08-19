@@ -9,6 +9,6 @@ export const colors = {
     "#152033", // 6
     "#0F1828", // 7
   ],
-  white: ["#F7F7FC", "#EDEDED"],
+  white: ["#F7F7FC", "#EDEDED", "#ADB5BD"],
   transparent: "transparent",
 };

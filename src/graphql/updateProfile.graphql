@@ -1,21 +1,22 @@
-mutation createProfile(
+mutation updateProfile(
   $firstName: String
   $lastName: String
   $avatar: String
   $avatarExt: String
+  $password: String
 ) {
   updateUser(
     firstName: $firstName
     lastName: $lastName
     avatar: $avatar
     avatarExt: $avatarExt
+    password: $password
   ) {
     id
     firstName
     lastName
     avatar
     email
-    haveProfile
-    isAuthenticated
+    authStatus
   }
 }

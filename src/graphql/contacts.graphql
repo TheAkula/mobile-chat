@@ -3,7 +3,7 @@ query contacts {
     id
     firstName
     lastName
-    isActive
+    authStatus
     avatar
   }
 }

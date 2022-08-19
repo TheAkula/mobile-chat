@@ -9,11 +9,13 @@ import { RootParamList, RootRoute } from "./types";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AsyncStorageKey } from "src/constants";
+import styled from "styled-components/native";
+import { AuthStatus } from "src/generated/graphql";
 
 const RootStack = createStackNavigator<RootParamList>();
 
 export const Routes = () => {
-  const { $user } = useUserStore();
+  const { user } = useUserStore();
   const fetchUserInfo = useFetchUserInfo();
   const [isFetched, setIsFetched] = useState(false);
 
@@ -47,19 +49,20 @@ export const Routes = () => {
       />
       <RootStack.Navigator
         initialRouteName={RootRoute.Auth}
-        screenOptions={{
+        screenOptions={({ route }) => ({
           headerBackImage: () => <Chevron />,
-          headerTitle: ({ children }) => <Text>{children}</Text>,
+          headerTitle: ({ children }) => <StyledTitle>{children}</StyledTitle>,
           headerStyle: {
             backgroundColor: AppTheme.colors.blue[7],
           },
+          headerShown: false,
           headerShadowVisible: false,
-        }}
+        })}
       >
-        {$user?.haveProfile && (
+        {user?.authStatus === AuthStatus.HaveAccount && (
           <RootStack.Screen name={RootRoute.Main} component={Main} />
         )}
-        {!$user?.haveProfile && (
+        {user?.authStatus !== AuthStatus.HaveAccount && (
           <RootStack.Screen
             name={RootRoute.Auth}
             component={Auth}
@@ -70,3 +73,9 @@ export const Routes = () => {
     </>
   );
 };
+
+const StyledTitle = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.semiBig};
+  line-height: ${({ theme }) => theme.lineHeights.semiBig};
+  color: ${({ theme }) => theme.colors.white[0]};
+`;

@@ -2,13 +2,11 @@ import { createEffect } from "effector";
 import { useUnit } from "effector-react";
 import { apolloClient } from "src/api";
 import {
-  CreateProfileDocument,
-  CreateProfileMutation,
-  CreateProfileMutationResult,
-  CreateProfileMutationVariables,
+  UpdateProfileDocument,
+  UpdateProfileMutation,
+  UpdateProfileMutationVariables,
   MyInfoDocument,
   MyInfoQuery,
-  MyInfoQueryResult,
 } from "src/generated/graphql";
 
 export const fetchUserInfoFX = createEffect(async () => {
@@ -18,9 +16,9 @@ export const fetchUserInfoFX = createEffect(async () => {
 });
 
 export const updateProfileFx = createEffect(
-  async (variables: CreateProfileMutationVariables) => {
-    return apolloClient.mutate<CreateProfileMutation>({
-      mutation: CreateProfileDocument,
+  async (variables: UpdateProfileMutationVariables) => {
+    return apolloClient.mutate<UpdateProfileMutation>({
+      mutation: UpdateProfileDocument,
       variables,
     });
   }

@@ -1,7 +1,6 @@
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
+import { StackScreenProps } from "@react-navigation/stack";
 import { AuthRoute, AuthParamList } from "src/navigation/types";
-import { Container, Input, Button } from "src/components";
+import { Container } from "src/components";
 import {
   AuthContainer,
   ButtonContainer,
@@ -18,9 +17,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
 import { Keyboard } from "react-native";
-import { useConfirmSignUpWith2faMutation } from "src/generated/graphql";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AsyncStorageKey } from "src/constants";
+import { useConfirmSignupWith2fa } from "src/models";
 
 type Props = StackScreenProps<AuthParamList, AuthRoute.AuthCode>;
 
@@ -30,28 +27,15 @@ export const AuthCode = ({ navigation, route: { params } }: Props) => {
   const { email, counter } = params;
   const [isFull, setIsFull] = useState(false);
   const inputRef = useRef<TextInput>();
-  const [confirmSignUp] = useConfirmSignUpWith2faMutation();
+  const confirmSignupWith2fa = useConfirmSignupWith2fa();
 
   useEffect(() => {
     const nums = code.map((c) => (c ? c : "")).join("");
     if (nums.length === 6) {
       setIsFull(true);
       Keyboard.dismiss();
-      confirmSignUp({
-        variables: {
-          counter,
-          code: +nums,
-        },
-        async onCompleted(data) {
-          await AsyncStorage.setItem(
-            AsyncStorageKey.USER_TOKEN,
-            data.confirmSignUpWith2fa.userToken || ""
-          );
-          navigate(AuthRoute.AuthProfile);
-        },
-        onError(err) {
-          console.log(err);
-        },
+      confirmSignupWith2fa({ counter, code: +nums }).then(() => {
+        navigate(AuthRoute.AuthProfile);
       });
     }
   }, [code]);

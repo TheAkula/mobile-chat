@@ -4,6 +4,7 @@ import {
   Chats as ChatsIcon,
   MessageCircle,
   MoreHorizontal,
+  Header,
 } from "src/components";
 import { Chats, Contacts, More } from "src/screens";
 import { AppTheme } from "src/theme";
@@ -15,7 +16,8 @@ export const Main = () => {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: false,
+        // headerShown: false,
+        header: (props) => <Header {...props} />,
         tabBarStyle: {
           backgroundColor: AppTheme.colors.blue[7],
           borderTopWidth: 0,

@@ -1,11 +1,6 @@
-import { TextInputProps } from "react-native";
 import styled from "styled-components/native";
 
-export const Input = (props: TextInputProps) => {
-  return <StyledTextInput {...props} />;
-};
-
-const StyledTextInput = styled.TextInput.attrs(({ theme }) => ({
+export const Input = styled.TextInput.attrs(({ theme }) => ({
   placeholderTextColor: theme.colors.white[0],
 }))`
   background-color: ${({ theme }) => theme.colors.blue[5]};
