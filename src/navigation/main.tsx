@@ -29,9 +29,7 @@ export const Main = () => {
         name={MainRoute.Contacts}
         component={Contacts}
         options={({ navigation }) => ({
-          header: (props) => (
-            <Header {...props} buttons={<AddContactButton />} />
-          ),
+          headerShown: false,
           tabBarButton: (props) => (
             <TabBarButton
               title="Contacts"

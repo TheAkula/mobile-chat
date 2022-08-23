@@ -78,14 +78,14 @@ export type MessageLink = {
 export type Mutation = {
   __typename?: 'Mutation';
   addFriend: User;
-  confirmSignUpWith2fa: User;
+  confirmSignUpWith2fa: UserWithAuth;
   createChat: Chat;
   createMessage: Message;
   inviteToChat: Invitation;
   inviteToFriends: Invitation;
   login: Auth;
   removeFriend: Scalars['String'];
-  signUp: User;
+  signUp: UserWithAuth;
   signUpWith2fa: TwoFactorAuth;
   updateUser: User;
 };
@@ -228,7 +228,6 @@ export type User = {
   lastSeen: Scalars['String'];
   myInvitations: Array<Invitation>;
   notifications: Array<Notification>;
-  userToken?: Maybe<Scalars['String']>;
 };
 
 export type UserLink = {
@@ -239,6 +238,25 @@ export type UserLink = {
   id: Scalars['String'];
   isActive: Scalars['Boolean'];
   lastName?: Maybe<Scalars['String']>;
+};
+
+export type UserWithAuth = {
+  __typename?: 'UserWithAuth';
+  authStatus: AuthStatus;
+  avatar?: Maybe<Scalars['String']>;
+  chats: Array<ChatLink>;
+  email: Scalars['String'];
+  firstName?: Maybe<Scalars['String']>;
+  friends: Array<UserLink>;
+  id: Scalars['String'];
+  invitations: Array<Invitation>;
+  isActive: Scalars['Boolean'];
+  isFriend?: Maybe<Scalars['Boolean']>;
+  lastName?: Maybe<Scalars['String']>;
+  lastSeen: Scalars['String'];
+  myInvitations: Array<Invitation>;
+  notifications: Array<Notification>;
+  userToken: Scalars['String'];
 };
 
 export type AddContactMutationVariables = Exact<{
@@ -254,12 +272,12 @@ export type ConfirmSignUpWith2faMutationVariables = Exact<{
 }>;
 
 
-export type ConfirmSignUpWith2faMutation = { __typename?: 'Mutation', confirmSignUpWith2fa: { __typename?: 'User', userToken?: string | null } };
+export type ConfirmSignUpWith2faMutation = { __typename?: 'Mutation', confirmSignUpWith2fa: { __typename?: 'UserWithAuth', userToken: string } };
 
 export type ContactsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ContactsQuery = { __typename?: 'Query', myFriends: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, authStatus: AuthStatus, avatar?: string | null }> };
+export type ContactsQuery = { __typename?: 'Query', myFriends: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, lastSeen: string }> };
 
 export type MyInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -302,7 +320,7 @@ export type UpdateProfileMutation = { __typename?: 'Mutation', updateUser: { __t
 export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, isFriend?: boolean | null, lastSeen: string }> };
+export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, isFriend?: boolean | null }> };
 
 
 export const AddContactDocument = gql`
@@ -383,8 +401,8 @@ export const ContactsDocument = gql`
     id
     firstName
     lastName
-    authStatus
     avatar
+    lastSeen
   }
 }
     `;
@@ -609,7 +627,6 @@ export const UsersDocument = gql`
     lastName
     avatar
     isFriend
-    lastSeen
   }
 }
     `;

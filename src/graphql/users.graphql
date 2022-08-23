@@ -5,6 +5,5 @@ query users {
     lastName
     avatar
     isFriend
-    lastSeen
   }
 }

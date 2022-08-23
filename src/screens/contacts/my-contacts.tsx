@@ -11,7 +11,9 @@ export const MyContacts = () => {
   const fetchMyContacts = useFetchMyContacts();
 
   useEffect(() => {
-    fetchMyContacts();
+    if (!myContacts || !myContacts.length) {
+      fetchMyContacts();
+    }
   }, []);
 
   if (!myContacts || myContactsLoading) {

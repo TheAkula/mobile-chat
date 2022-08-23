@@ -51,6 +51,6 @@ export default function App() {
 }
 
 const AppContainer = styled.View`
-  background-color: ${({ theme }) => theme.colors.blue[5]};
+  background-color: ${({ theme }) => theme.colors.blue[7]};
   flex: 1;
 `;

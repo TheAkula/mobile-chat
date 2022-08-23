@@ -1,12 +1,8 @@
-import { useStore, useUnit } from "effector-react";
 import { useEffect } from "react";
 import { Text, View } from "react-native";
-import { Button, Container, SearchInput } from "src/components";
+import { Container, SearchInput } from "src/components";
 import { ContactsList } from "src/components/contacts";
 import {
-  $users,
-  $usersLoading,
-  removeUser,
   useAddMyContact,
   useFetchUsers,
   useRemoveContact,
@@ -22,7 +18,9 @@ export const AddContact = () => {
   const removeContact = useRemoveContact();
 
   useEffect(() => {
-    fetchUsers();
+    if (!users || !users.length) {
+      fetchUsers();
+    }
   }, []);
 
   const addedContact = (id: string) => {
@@ -37,22 +35,21 @@ export const AddContact = () => {
     });
   };
 
-  const remove = useUnit(removeUser);
+  if (usersLoading || !users) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
-  // if (usersLoading) {
-  //   return (
-  //     <View>
-  //       <Text>Loading...</Text>
-  //     </View>
-  //   );
-  // }
+  console.log(users);
 
   return (
     <View>
       <Container>
         <SearchContainer>
           <SearchInput placeholderTextColor={AppTheme.colors.white[2]} />
-          <Button onPress={() => remove("qwe")}>Delete</Button>
         </SearchContainer>
         <ContactsList
           contacts={users}
