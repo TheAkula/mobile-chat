@@ -34,9 +34,15 @@ export type Chat = {
   id: Scalars['String'];
   imgUrl?: Maybe<Scalars['String']>;
   isFriendsChat: Scalars['Boolean'];
-  messages: Array<MessageLink>;
+  messages: Array<Message>;
   name?: Maybe<Scalars['String']>;
+  notSeen: Scalars['Int'];
   users: Array<UserLink>;
+};
+
+
+export type ChatMessagesArgs = {
+  filter?: InputMaybe<ChatsFilter>;
 };
 
 export type ChatLink = {
@@ -45,6 +51,10 @@ export type ChatLink = {
   imgUrl?: Maybe<Scalars['String']>;
   isFriendsChat: Scalars['Boolean'];
   name?: Maybe<Scalars['String']>;
+};
+
+export type ChatsFilter = {
+  messagesAmount?: InputMaybe<Scalars['Int']>;
 };
 
 export type Invitation = {
@@ -65,14 +75,7 @@ export type Message = {
   createdAt: Scalars['DateTime'];
   id: Scalars['String'];
   updatedAt: Scalars['DateTime'];
-};
-
-export type MessageLink = {
-  __typename?: 'MessageLink';
-  content: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  id: Scalars['String'];
-  updatedAt: Scalars['DateTime'];
+  usersSeen: UserLink;
 };
 
 export type Mutation = {
@@ -81,6 +84,7 @@ export type Mutation = {
   confirmSignUpWith2fa: UserWithAuth;
   createChat: Chat;
   createMessage: Message;
+  createPersonalChat: Chat;
   inviteToChat: Invitation;
   inviteToFriends: Invitation;
   login: Auth;
@@ -97,14 +101,12 @@ export type MutationAddFriendArgs = {
 
 
 export type MutationConfirmSignUpWith2faArgs = {
-  code: Scalars['Float'];
-  counter: Scalars['Float'];
+  code: Scalars['Int'];
+  counter: Scalars['Int'];
 };
 
 
 export type MutationCreateChatArgs = {
-  id?: InputMaybe<Scalars['String']>;
-  isFriendsChat?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Scalars['String']>;
 };
 
@@ -112,6 +114,11 @@ export type MutationCreateChatArgs = {
 export type MutationCreateMessageArgs = {
   chatId: Scalars['String'];
   content: Scalars['String'];
+};
+
+
+export type MutationCreatePersonalChatArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -171,8 +178,8 @@ export type Notification = {
 
 export type Query = {
   __typename?: 'Query';
-  mainChats: Array<Chat>;
   messages: Array<Message>;
+  myChats: Array<Chat>;
   myFriends: Array<User>;
   myNotifications: Array<Notification>;
   myUserInfo: User;
@@ -208,7 +215,7 @@ export type SubscriptionMessageCreatedArgs = {
 
 export type TwoFactorAuth = {
   __typename?: 'TwoFactorAuth';
-  counter: Scalars['Float'];
+  counter: Scalars['Int'];
   userToken: Scalars['String'];
 };
 
@@ -267,8 +274,8 @@ export type AddContactMutationVariables = Exact<{
 export type AddContactMutation = { __typename?: 'Mutation', addFriend: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, isActive: boolean, lastSeen: string, avatar?: string | null } };
 
 export type ConfirmSignUpWith2faMutationVariables = Exact<{
-  code: Scalars['Float'];
-  counter: Scalars['Float'];
+  code: Scalars['Int'];
+  counter: Scalars['Int'];
 }>;
 
 
@@ -278,6 +285,13 @@ export type ContactsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ContactsQuery = { __typename?: 'Query', myFriends: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, lastSeen: string }> };
+
+export type MyChatsQueryVariables = Exact<{
+  filter?: InputMaybe<ChatsFilter>;
+}>;
+
+
+export type MyChatsQuery = { __typename?: 'Query', myChats: Array<{ __typename?: 'Chat', id: string, name?: string | null, imgUrl?: string | null, notSeen: number, isFriendsChat: boolean, messages: Array<{ __typename?: 'Message', content: string, createdAt: any, author: { __typename?: 'UserLink', id: string, firstName?: string | null } }>, friend?: { __typename?: 'UserLink', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null } | null }> };
 
 export type MyInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -362,7 +376,7 @@ export type AddContactMutationHookResult = ReturnType<typeof useAddContactMutati
 export type AddContactMutationResult = Apollo.MutationResult<AddContactMutation>;
 export type AddContactMutationOptions = Apollo.BaseMutationOptions<AddContactMutation, AddContactMutationVariables>;
 export const ConfirmSignUpWith2faDocument = gql`
-    mutation confirmSignUpWith2fa($code: Float!, $counter: Float!) {
+    mutation confirmSignUpWith2fa($code: Int!, $counter: Int!) {
   confirmSignUpWith2fa(code: $code, counter: $counter) {
     userToken
   }
@@ -433,6 +447,59 @@ export function useContactsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<C
 export type ContactsQueryHookResult = ReturnType<typeof useContactsQuery>;
 export type ContactsLazyQueryHookResult = ReturnType<typeof useContactsLazyQuery>;
 export type ContactsQueryResult = Apollo.QueryResult<ContactsQuery, ContactsQueryVariables>;
+export const MyChatsDocument = gql`
+    query myChats($filter: ChatsFilter) {
+  myChats {
+    id
+    name
+    imgUrl
+    messages(filter: $filter) {
+      content
+      author {
+        id
+        firstName
+      }
+      createdAt
+    }
+    notSeen
+    isFriendsChat
+    friend {
+      id
+      firstName
+      lastName
+      avatar
+    }
+  }
+}
+    `;
+
+/**
+ * __useMyChatsQuery__
+ *
+ * To run a query within a React component, call `useMyChatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyChatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyChatsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useMyChatsQuery(baseOptions?: Apollo.QueryHookOptions<MyChatsQuery, MyChatsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MyChatsQuery, MyChatsQueryVariables>(MyChatsDocument, options);
+      }
+export function useMyChatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyChatsQuery, MyChatsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MyChatsQuery, MyChatsQueryVariables>(MyChatsDocument, options);
+        }
+export type MyChatsQueryHookResult = ReturnType<typeof useMyChatsQuery>;
+export type MyChatsLazyQueryHookResult = ReturnType<typeof useMyChatsLazyQuery>;
+export type MyChatsQueryResult = Apollo.QueryResult<MyChatsQuery, MyChatsQueryVariables>;
 export const MyInfoDocument = gql`
     query myInfo {
   myUserInfo {

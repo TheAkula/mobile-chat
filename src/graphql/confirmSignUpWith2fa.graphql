@@ -1,4 +1,4 @@
-mutation confirmSignUpWith2fa($code: Float!, $counter: Float!) {
+mutation confirmSignUpWith2fa($code: Int!, $counter: Int!) {
   confirmSignUpWith2fa(code: $code, counter: $counter) {
     userToken
   }

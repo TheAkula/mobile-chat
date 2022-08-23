@@ -25,6 +25,12 @@ export enum ContactsRoute {
   AddContact = "AddContact",
 }
 
+export enum ChatsRoute {
+  MyChats = "MyChats",
+  AddChat = "AddChat",
+  Chat = "Chat",
+}
+
 export type RootParamList = {
   [RootRoute.Auth]: NavigatorScreenParams<AuthParamList>;
   [RootRoute.Main]: undefined;
@@ -48,4 +54,10 @@ export type MainParamList = {
 export type ContactsParamList = {
   [ContactsRoute.AddContact]: undefined;
   [ContactsRoute.MyContacts]: undefined;
+};
+
+export type ChatsParamsList = {
+  [ChatsRoute.AddChat]: undefined;
+  [ChatsRoute.MyChats]: undefined;
+  [ChatsRoute.Chat]: { name: string; userId: string };
 };

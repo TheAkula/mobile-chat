@@ -1,0 +1,23 @@
+query myChats($filter: ChatsFilter) {
+  myChats {
+    id
+    name
+    imgUrl
+    messages(filter: $filter) {
+      content
+      author {
+        id
+        firstName
+      }
+      createdAt
+    }
+    notSeen
+    isFriendsChat
+    friend {
+      id
+      firstName
+      lastName
+      avatar
+    }
+  }
+}

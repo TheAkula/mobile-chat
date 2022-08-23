@@ -12,3 +12,4 @@ export const $userStore = combine({
 });
 
 export const useUserStore = () => useStore($userStore);
+export const useUser = () => useStore($user);
