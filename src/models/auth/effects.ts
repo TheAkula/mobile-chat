@@ -43,8 +43,6 @@ export const signinFx = createEffect(
 );
 
 export const setTokenFx = createEffect(async (token: string) => {
-  console.log(token);
-
   await AsyncStorage.setItem(AsyncStorageKey.USER_TOKEN, token);
 });
 

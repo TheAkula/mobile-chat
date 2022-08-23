@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
 import { Container, SearchInput } from "src/components";
-import { ContactsList } from "src/components/contacts/contacts-list";
+import { ContactsList } from "src/components/contacts";
 import { useFetchMyContacts, useMyContactsStore } from "src/models";
 import { AppTheme } from "src/theme";
 import styled from "styled-components/native";
 
-export const Contacts = () => {
+export const MyContacts = () => {
   const { myContacts, myContactsLoading } = useMyContactsStore();
   const fetchMyContacts = useFetchMyContacts();
 

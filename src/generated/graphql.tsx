@@ -84,9 +84,15 @@ export type Mutation = {
   inviteToChat: Invitation;
   inviteToFriends: Invitation;
   login: Auth;
+  removeFriend: Scalars['String'];
   signUp: User;
   signUpWith2fa: TwoFactorAuth;
   updateUser: User;
+};
+
+
+export type MutationAddFriendArgs = {
+  friendId: Scalars['String'];
 };
 
 
@@ -122,6 +128,11 @@ export type MutationInviteToFriendsArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationRemoveFriendArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -166,6 +177,7 @@ export type Query = {
   myNotifications: Array<Notification>;
   myUserInfo: User;
   user: User;
+  users: Array<User>;
 };
 
 
@@ -211,6 +223,7 @@ export type User = {
   id: Scalars['String'];
   invitations: Array<Invitation>;
   isActive: Scalars['Boolean'];
+  isFriend?: Maybe<Scalars['Boolean']>;
   lastName?: Maybe<Scalars['String']>;
   lastSeen: Scalars['String'];
   myInvitations: Array<Invitation>;
@@ -227,6 +240,13 @@ export type UserLink = {
   isActive: Scalars['Boolean'];
   lastName?: Maybe<Scalars['String']>;
 };
+
+export type AddContactMutationVariables = Exact<{
+  friendId: Scalars['String'];
+}>;
+
+
+export type AddContactMutation = { __typename?: 'Mutation', addFriend: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, isActive: boolean, lastSeen: string, avatar?: string | null } };
 
 export type ConfirmSignUpWith2faMutationVariables = Exact<{
   code: Scalars['Float'];
@@ -245,6 +265,13 @@ export type MyInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MyInfoQuery = { __typename?: 'Query', myUserInfo: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, email: string, avatar?: string | null, authStatus: AuthStatus } };
+
+export type RemoveContactMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type RemoveContactMutation = { __typename?: 'Mutation', removeFriend: string };
 
 export type SigninMutationVariables = Exact<{
   email: Scalars['String'];
@@ -272,7 +299,50 @@ export type UpdateProfileMutationVariables = Exact<{
 
 export type UpdateProfileMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, email: string, authStatus: AuthStatus } };
 
+export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
+
+export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, isFriend?: boolean | null, lastSeen: string }> };
+
+
+export const AddContactDocument = gql`
+    mutation addContact($friendId: String!) {
+  addFriend(friendId: $friendId) {
+    id
+    firstName
+    lastName
+    isActive
+    lastSeen
+    avatar
+  }
+}
+    `;
+export type AddContactMutationFn = Apollo.MutationFunction<AddContactMutation, AddContactMutationVariables>;
+
+/**
+ * __useAddContactMutation__
+ *
+ * To run a mutation, you first call `useAddContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addContactMutation, { data, loading, error }] = useAddContactMutation({
+ *   variables: {
+ *      friendId: // value for 'friendId'
+ *   },
+ * });
+ */
+export function useAddContactMutation(baseOptions?: Apollo.MutationHookOptions<AddContactMutation, AddContactMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddContactMutation, AddContactMutationVariables>(AddContactDocument, options);
+      }
+export type AddContactMutationHookResult = ReturnType<typeof useAddContactMutation>;
+export type AddContactMutationResult = Apollo.MutationResult<AddContactMutation>;
+export type AddContactMutationOptions = Apollo.BaseMutationOptions<AddContactMutation, AddContactMutationVariables>;
 export const ConfirmSignUpWith2faDocument = gql`
     mutation confirmSignUpWith2fa($code: Float!, $counter: Float!) {
   confirmSignUpWith2fa(code: $code, counter: $counter) {
@@ -384,6 +454,37 @@ export function useMyInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyI
 export type MyInfoQueryHookResult = ReturnType<typeof useMyInfoQuery>;
 export type MyInfoLazyQueryHookResult = ReturnType<typeof useMyInfoLazyQuery>;
 export type MyInfoQueryResult = Apollo.QueryResult<MyInfoQuery, MyInfoQueryVariables>;
+export const RemoveContactDocument = gql`
+    mutation removeContact($id: String!) {
+  removeFriend(id: $id)
+}
+    `;
+export type RemoveContactMutationFn = Apollo.MutationFunction<RemoveContactMutation, RemoveContactMutationVariables>;
+
+/**
+ * __useRemoveContactMutation__
+ *
+ * To run a mutation, you first call `useRemoveContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeContactMutation, { data, loading, error }] = useRemoveContactMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useRemoveContactMutation(baseOptions?: Apollo.MutationHookOptions<RemoveContactMutation, RemoveContactMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveContactMutation, RemoveContactMutationVariables>(RemoveContactDocument, options);
+      }
+export type RemoveContactMutationHookResult = ReturnType<typeof useRemoveContactMutation>;
+export type RemoveContactMutationResult = Apollo.MutationResult<RemoveContactMutation>;
+export type RemoveContactMutationOptions = Apollo.BaseMutationOptions<RemoveContactMutation, RemoveContactMutationVariables>;
 export const SigninDocument = gql`
     mutation signin($email: String!, $password: String!) {
   login(email: $email, password: $password) {
@@ -500,3 +601,42 @@ export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
 export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
 export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
+export const UsersDocument = gql`
+    query users {
+  users {
+    id
+    firstName
+    lastName
+    avatar
+    isFriend
+    lastSeen
+  }
+}
+    `;
+
+/**
+ * __useUsersQuery__
+ *
+ * To run a query within a React component, call `useUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUsersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUsersQuery(baseOptions?: Apollo.QueryHookOptions<UsersQuery, UsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UsersQuery, UsersQueryVariables>(UsersDocument, options);
+      }
+export function useUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UsersQuery, UsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UsersQuery, UsersQueryVariables>(UsersDocument, options);
+        }
+export type UsersQueryHookResult = ReturnType<typeof useUsersQuery>;
+export type UsersLazyQueryHookResult = ReturnType<typeof useUsersLazyQuery>;
+export type UsersQueryResult = Apollo.QueryResult<UsersQuery, UsersQueryVariables>;

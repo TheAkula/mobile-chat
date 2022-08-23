@@ -1,16 +1,14 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import { View } from "react-native";
 import { Header } from "src/components";
-import {
-  AuthCode,
-  AuthEmail,
-  AuthPassword,
-  AuthProfile,
-  Welcome,
-} from "src/components/auth";
 import { AuthStatus } from "src/generated/graphql";
 import { useUserStore } from "src/models";
 import { AuthParamList, AuthRoute } from "src/navigation/types";
+import { AuthCode } from "./auth-code";
+import { AuthEmail } from "./auth-email";
+import { AuthPassword } from "./auth-password";
+import { AuthProfile } from "./auth-profile";
+import { AuthSignIn } from "./auth-signin";
+import { Welcome } from "./auth-welcome";
 
 const AuthStack = createStackNavigator<AuthParamList>();
 
@@ -21,7 +19,7 @@ const getRoute = (status: AuthStatus | undefined) => {
     case AuthStatus.HaveProfile:
       return AuthRoute.AuthPassword;
     default:
-      return AuthRoute.AuthPhone;
+      return AuthRoute.AuthWelcome;
   }
 };
 
@@ -43,6 +41,7 @@ export const Auth = () => {
         name={AuthRoute.AuthPassword}
         component={AuthPassword}
       />
+      <AuthStack.Screen name={AuthRoute.AuthSignIn} component={AuthSignIn} />
     </AuthStack.Navigator>
   );
 };

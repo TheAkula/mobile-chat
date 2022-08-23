@@ -54,6 +54,7 @@ const StyledHeader = styled.View`
 `;
 
 const Title = styled.Text`
+  padding-left: 8px;
   font-size: ${({ theme }) => theme.fontSizes.semiBig};
   line-height: ${({ theme }) => theme.lineHeights.semiBig};
   color: ${({ theme }) => theme.colors.white[0]};

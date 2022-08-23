@@ -32,7 +32,5 @@ $user
   });
 
 $userLoading
-  .on(fetchUserInfoFX.pending, () => true)
-  .on(fetchUserInfoFX.finally, () => false)
-  .on(updateProfileFx.pending, () => true)
-  .on(updateProfileFx.finally, () => false);
+  .on(fetchUserInfoFX.pending, (payload) => payload)
+  .on(updateProfileFx.pending, (payload) => payload);

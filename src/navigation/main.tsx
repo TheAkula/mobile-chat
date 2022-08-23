@@ -6,6 +6,7 @@ import {
   MoreHorizontal,
   Header,
 } from "src/components";
+import { AddContactButton } from "src/components/contacts";
 import { Chats, Contacts, More } from "src/screens";
 import { AppTheme } from "src/theme";
 import { MainParamList, MainRoute } from "./types";
@@ -16,11 +17,11 @@ export const Main = () => {
   return (
     <Tab.Navigator
       screenOptions={{
-        // headerShown: false,
         header: (props) => <Header {...props} />,
         tabBarStyle: {
           backgroundColor: AppTheme.colors.blue[7],
           borderTopWidth: 0,
+          borderTopColor: AppTheme.colors.blue[7],
         },
       }}
     >
@@ -28,6 +29,9 @@ export const Main = () => {
         name={MainRoute.Contacts}
         component={Contacts}
         options={({ navigation }) => ({
+          header: (props) => (
+            <Header {...props} buttons={<AddContactButton />} />
+          ),
           tabBarButton: (props) => (
             <TabBarButton
               title="Contacts"

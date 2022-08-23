@@ -1,3 +1,4 @@
 import "./user/init";
-import "./contacts/init";
+import "./my-contacts/init";
 import "./auth/init";
+import "./users/init";

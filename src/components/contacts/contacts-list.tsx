@@ -5,11 +5,14 @@ import { Contact } from "./contact";
 
 interface Props {
   contacts: Partial<User>[];
+  add?: (id: string) => void;
+  remove?: (id: string) => void;
+  send?: (id: string) => void;
 }
 
-export const ContactsList = ({ contacts }: Props) => {
+export const ContactsList = ({ contacts, add, remove, send }: Props) => {
   const renderItem: ListRenderItem<Partial<User>> = ({ item }) => {
-    return <Contact item={item} />;
+    return <Contact item={item} add={add} remove={remove} send={send} />;
   };
 
   if (!contacts.length) {

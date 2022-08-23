@@ -1,3 +1,4 @@
 export * from "./user";
-export * from "./contacts";
+export * from "./my-contacts";
 export * from "./auth";
+export * from "./users";

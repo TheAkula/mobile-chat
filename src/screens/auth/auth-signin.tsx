@@ -4,6 +4,7 @@ import { Container, Input, Button } from "src/components";
 import { useSignin } from "src/models";
 import { AuthSignIn as AuthSignInForm } from "src/types";
 import { authSignin } from "src/utils";
+import styled from "styled-components/native";
 import {
   AuthContainer,
   ButtonContainer,
@@ -45,7 +46,7 @@ export const AuthSignIn = () => {
             control={control}
             name="email"
             render={({ field: { onChange, onBlur, value } }) => (
-              <Input
+              <StyledInput
                 onChangeText={onChange}
                 value={value}
                 onBlur={onBlur}
@@ -58,7 +59,7 @@ export const AuthSignIn = () => {
             control={control}
             name="password"
             render={({ field: { onChange, onBlur, value } }) => (
-              <Input
+              <StyledInput
                 onChangeText={onChange}
                 type="password"
                 value={value}
@@ -79,3 +80,7 @@ export const AuthSignIn = () => {
     </AuthContainer>
   );
 };
+
+const StyledInput = styled(Input)`
+  margin-bottom: 12px;
+`;

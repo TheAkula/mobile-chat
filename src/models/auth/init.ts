@@ -24,17 +24,13 @@ $auth
     };
   });
 
-$authLoading
-  .on(signupWith2faFx.pending, () => true)
-  .on(signupWith2faFx.finally, () => false);
+$authLoading.on(signupWith2faFx.pending, (payload) => payload);
 
 $authError.on(signupWith2faFx.failData, (_, err) => err);
 
 sample({
   clock: signupWith2faFx.doneData,
   fn: (data) => {
-    console.log(data, data.data?.signUpWith2fa.userToken);
-
     return data.data?.signUpWith2fa.userToken || "";
   },
   target: setTokenFx,
@@ -53,6 +49,6 @@ sample({
 });
 
 sample({
-  clock: signinFx,
+  clock: signinFx.done,
   target: fetchUserInfoFX,
 });

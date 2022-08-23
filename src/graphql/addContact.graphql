@@ -1,0 +1,10 @@
+mutation addContact($friendId: String!) {
+  addFriend(friendId: $friendId) {
+    id
+    firstName
+    lastName
+    isActive
+    lastSeen
+    avatar
+  }
+}

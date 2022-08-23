@@ -1,0 +1,3 @@
+mutation removeContact($id: String!) {
+  removeFriend(id: $id)
+}
