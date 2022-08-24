@@ -24,7 +24,7 @@ $auth
     };
   });
 
-$authLoading.on(signupWith2faFx.pending, (payload) => payload);
+$authLoading.on(signupWith2faFx.pending, (_, payload) => payload);
 
 $authError.on(signupWith2faFx.failData, (_, err) => err);
 

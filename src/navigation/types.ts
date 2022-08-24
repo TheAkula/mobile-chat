@@ -3,6 +3,7 @@ import { NavigatorScreenParams } from "@react-navigation/native";
 export enum RootRoute {
   Auth = "Auth",
   Main = "Main",
+  Chat = "Chat",
 }
 
 export enum AuthRoute {
@@ -28,12 +29,12 @@ export enum ContactsRoute {
 export enum ChatsRoute {
   MyChats = "MyChats",
   AddChat = "AddChat",
-  Chat = "Chat",
 }
 
 export type RootParamList = {
   [RootRoute.Auth]: NavigatorScreenParams<AuthParamList>;
-  [RootRoute.Main]: undefined;
+  [RootRoute.Main]: NavigatorScreenParams<MainParamList>;
+  [RootRoute.Chat]: { name: string; chatId: string };
 };
 
 export type AuthParamList = {
@@ -46,8 +47,8 @@ export type AuthParamList = {
 };
 
 export type MainParamList = {
-  [MainRoute.Chats]: undefined;
-  [MainRoute.Contacts]: undefined;
+  [MainRoute.Chats]: NavigatorScreenParams<ChatsParamsList>;
+  [MainRoute.Contacts]: NavigatorScreenParams<ContactsParamList>;
   [MainRoute.More]: undefined;
 };
 
@@ -59,5 +60,4 @@ export type ContactsParamList = {
 export type ChatsParamsList = {
   [ChatsRoute.AddChat]: undefined;
   [ChatsRoute.MyChats]: undefined;
-  [ChatsRoute.Chat]: { name: string; userId: string };
 };

@@ -9,3 +9,4 @@ export { MoreHorizontal } from "./MoreHorizontal";
 export { Plus } from "./Plus";
 export { Search } from "./Search";
 export { Welcome } from "./Welcome";
+export { Send } from "./Send";

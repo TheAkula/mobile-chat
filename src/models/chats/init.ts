@@ -3,6 +3,6 @@ import { $chats, $chatsError, $chatsLoading } from "./state";
 
 $chats.on(fetchMyChatsFx.doneData, (_, response) => response.data.myChats);
 
-$chatsLoading.on(fetchMyChatsFx.pending, (payload) => payload);
+$chatsLoading.on(fetchMyChatsFx.pending, (_, payload) => payload);
 
-$chatsError.on(fetchMyChatsFx.fail, (err) => err);
+$chatsError.on(fetchMyChatsFx.failData, (_, err) => err);

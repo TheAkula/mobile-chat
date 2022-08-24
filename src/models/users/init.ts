@@ -1,5 +1,6 @@
-import { $users, fetchUsersFx, $usersLoading, $usersError } from ".";
+import { $users, $usersError, $usersLoading } from "./state";
 import { addMyContactFx, removeContactFx } from "../my-contacts";
+import { fetchUsersFx } from "./effects";
 
 $users
   .on(fetchUsersFx.doneData, (_, data) => data.data.users)
@@ -33,6 +34,6 @@ $users
       return updatedUsers;
     }
   });
-$usersLoading.on(fetchUsersFx.pending, (payload) => payload);
+$usersLoading.on(fetchUsersFx.pending, (_, payload) => payload);
 
 $usersError.on(fetchUsersFx.failData, (_, err) => err);

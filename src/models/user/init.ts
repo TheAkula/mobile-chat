@@ -1,3 +1,4 @@
+import { $usersError } from "../users";
 import { updateProfileFx, fetchUserInfoFX } from "./effects";
 import { $user, $userLoading } from "./state";
 
@@ -32,5 +33,9 @@ $user
   });
 
 $userLoading
-  .on(fetchUserInfoFX.pending, (payload) => payload)
-  .on(updateProfileFx.pending, (payload) => payload);
+  .on(fetchUserInfoFX.pending, (_, payload) => payload)
+  .on(updateProfileFx.pending, (_, payload) => payload);
+
+$usersError
+  .on(fetchUserInfoFX.failData, (_, err) => err)
+  .on(updateProfileFx.failData, (_, err) => err);

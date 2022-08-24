@@ -1,7 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar, Text, View } from "react-native";
 import { Chevron } from "src/components";
-import { Auth } from "src/screens";
+import { Auth, Chat } from "src/screens";
 import { Main } from "./main";
 import { AppTheme } from "src/theme";
 import { useFetchUserInfo, useUserStore } from "src/models";
@@ -60,7 +60,10 @@ export const Routes = () => {
         })}
       >
         {user?.authStatus === AuthStatus.HaveAccount && (
-          <RootStack.Screen name={RootRoute.Main} component={Main} />
+          <>
+            <RootStack.Screen name={RootRoute.Main} component={Main} />
+            <RootStack.Screen name={RootRoute.Chat} component={Chat} />
+          </>
         )}
         {user?.authStatus !== AuthStatus.HaveAccount && (
           <RootStack.Screen

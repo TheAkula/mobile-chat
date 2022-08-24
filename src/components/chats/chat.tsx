@@ -4,26 +4,44 @@ import styled from "styled-components/native";
 import { Avatar } from "src/components";
 import { DeepPartial } from "src/types";
 import { useUser } from "src/models";
-import { useNavigation } from "@react-navigation/native";
+import {
+  CompositeNavigationProp,
+  CompositeScreenProps,
+  useNavigation,
+} from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { ChatsParamsList, ChatsRoute } from "src/navigation/types";
+import {
+  ChatsParamsList,
+  ChatsRoute,
+  MainParamList,
+  MainRoute,
+  RootParamList,
+  RootRoute,
+} from "src/navigation/types";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 interface Props {
   item: DeepPartial<ChatType>;
 }
 
-type NavProp = StackNavigationProp<ChatsParamsList, ChatsRoute.MyChats>;
+type NavProp = CompositeNavigationProp<
+  StackNavigationProp<ChatsParamsList, ChatsRoute.MyChats>,
+  CompositeNavigationProp<
+    BottomTabNavigationProp<MainParamList, MainRoute.Chats>,
+    StackNavigationProp<RootParamList, RootRoute.Main>
+  >
+>;
 
 export const Chat = ({ item }: Props) => {
   const user = useUser();
   const { push } = useNavigation<NavProp>();
 
   const handlePress = () => {
-    push(ChatsRoute.Chat, {
+    push(RootRoute.Chat, {
       name: item.isFriendsChat
         ? [item.friend?.firstName, item.friend?.lastName].join(" ")
         : item.name || "",
-      userId: item.id || "",
+      chatId: item.id || "",
     });
   };
 
@@ -58,7 +76,7 @@ export const Chat = ({ item }: Props) => {
             </View>
           </Wrapper>
           <Wrapper>
-            {item.notSeen && (
+            {!!item.notSeen && (
               <MessagesCount>
                 <Count>{item.notSeen}</Count>
               </MessagesCount>

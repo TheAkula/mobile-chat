@@ -1,0 +1,16 @@
+query messages($id: String!) {
+  messages(id: $id) {
+    id
+    content
+    author {
+      id
+      avatar
+      firstName
+      lastName
+    }
+    createdAt
+    updatedAt
+    isRead
+    isMyRead
+  }
+}

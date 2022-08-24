@@ -1,6 +1,6 @@
 import { combine, createStore } from "effector";
 import { useStore } from "effector-react";
-import { Chat, Message, User, UserLink } from "src/generated/graphql";
+import { Chat } from "src/generated/graphql";
 import { DeepPartial } from "src/types";
 
 export const $chats = createStore<DeepPartial<Chat>[]>([]);
