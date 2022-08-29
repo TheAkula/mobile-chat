@@ -4,13 +4,20 @@ import styled from "styled-components/native";
 import { Contact } from "./contact";
 
 interface Props {
-  contacts: Partial<User>[];
+  contacts: Partial<Omit<User, "__typename">>[];
   add?: (id: string) => void;
   remove?: (id: string) => void;
   send?: (id: string) => void;
+  endReached?: () => void;
 }
 
-export const ContactsList = ({ contacts, add, remove, send }: Props) => {
+export const ContactsList = ({
+  contacts,
+  add,
+  remove,
+  send,
+  endReached,
+}: Props) => {
   const renderItem: ListRenderItem<Partial<User>> = ({ item }) => {
     return <Contact item={item} add={add} remove={remove} send={send} />;
   };
@@ -19,7 +26,13 @@ export const ContactsList = ({ contacts, add, remove, send }: Props) => {
     return <NoFind>No contacts</NoFind>;
   }
 
-  return <FlatList data={contacts} renderItem={renderItem} />;
+  return (
+    <FlatList
+      data={contacts}
+      renderItem={renderItem}
+      onEndReached={endReached}
+    />
+  );
 };
 
 const NoFind = styled.Text`

@@ -1,5 +1,5 @@
-query messages($id: String!, $filter: MessagesFilter, $page: Int) {
-  messages(id: $id, filter: $filter, page: $page) {
+query messages($id: String!, $filter: MessagesFilter, $page: Int, $skip: Int) {
+  messages(id: $id, filter: $filter, page: $page, skip: $skip) {
     data {
       id
       content

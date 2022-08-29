@@ -80,8 +80,17 @@ export const apolloClient = new ApolloClient({
             keyArgs: ["filter"],
 
             merge(existing = { data: [], nextPage: 0 }, incoming) {
-              console.log(existing.data.length, incoming.data.length);
+              return {
+                ...existing,
+                data: [...existing.data, ...incoming.data],
+                nextPage: incoming.nextPage,
+              };
+            },
+          },
+          users: {
+            keyArgs: ["filter"],
 
+            merge(existing = { data: [], nextPage: 0 }, incoming) {
               return {
                 ...existing,
                 data: [...existing.data, ...incoming.data],

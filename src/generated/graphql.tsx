@@ -207,21 +207,27 @@ export enum OrderDirection {
   Desc = 'DESC'
 }
 
-export type PaginatedMessage = {
-  __typename?: 'PaginatedMessage';
+export type PaginatedMessages = {
+  __typename?: 'PaginatedMessages';
   data: Array<Message>;
+  nextPage?: Maybe<Scalars['Int']>;
+};
+
+export type PaginatedUsers = {
+  __typename?: 'PaginatedUsers';
+  data: Array<User>;
   nextPage?: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
   __typename?: 'Query';
-  messages: PaginatedMessage;
+  messages: PaginatedMessages;
   myChats: Array<Chat>;
   myFriends: Array<User>;
   myNotifications: Array<Notification>;
   myUserInfo: User;
   user: User;
-  users: Array<User>;
+  users: PaginatedUsers;
 };
 
 
@@ -229,11 +235,19 @@ export type QueryMessagesArgs = {
   filter?: InputMaybe<MessagesFilter>;
   id: Scalars['String'];
   page?: InputMaybe<Scalars['Int']>;
+  skip?: InputMaybe<Scalars['Int']>;
 };
 
 
 export type QueryUserArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryUsersArgs = {
+  filter?: InputMaybe<UsersFilter>;
+  page?: InputMaybe<Scalars['Int']>;
+  skip?: InputMaybe<Scalars['Int']>;
 };
 
 export type Subscription = {
@@ -275,7 +289,7 @@ export type User = {
   id: Scalars['String'];
   invitations: Array<Invitation>;
   isActive: Scalars['Boolean'];
-  isFriend?: Maybe<Scalars['Boolean']>;
+  isFriend: Scalars['Boolean'];
   lastName?: Maybe<Scalars['String']>;
   lastSeen: Scalars['String'];
   myInvitations: Array<Invitation>;
@@ -303,13 +317,25 @@ export type UserWithAuth = {
   id: Scalars['String'];
   invitations: Array<Invitation>;
   isActive: Scalars['Boolean'];
-  isFriend?: Maybe<Scalars['Boolean']>;
+  isFriend: Scalars['Boolean'];
   lastName?: Maybe<Scalars['String']>;
   lastSeen: Scalars['String'];
   myInvitations: Array<Invitation>;
   notifications: Array<Notification>;
   userToken: Scalars['String'];
 };
+
+export type UsersFilter = {
+  name?: InputMaybe<Scalars['String']>;
+  orderBy?: InputMaybe<UsersOrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  take?: InputMaybe<Scalars['Int']>;
+};
+
+export enum UsersOrderBy {
+  FirstName = 'firstName',
+  LastName = 'lastName'
+}
 
 export type AddContactMutationVariables = Exact<{
   friendId: Scalars['String'];
@@ -329,7 +355,7 @@ export type ConfirmSignUpWith2faMutation = { __typename?: 'Mutation', confirmSig
 export type ContactsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ContactsQuery = { __typename?: 'Query', myFriends: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, lastSeen: string }> };
+export type ContactsQuery = { __typename?: 'Query', myFriends: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, lastSeen: string, isActive: boolean }> };
 
 export type MessageSendedSubscriptionVariables = Exact<{
   userId: Scalars['String'];
@@ -349,10 +375,11 @@ export type MessagesQueryVariables = Exact<{
   id: Scalars['String'];
   filter?: InputMaybe<MessagesFilter>;
   page?: InputMaybe<Scalars['Int']>;
+  skip?: InputMaybe<Scalars['Int']>;
 }>;
 
 
-export type MessagesQuery = { __typename?: 'Query', messages: { __typename?: 'PaginatedMessage', nextPage?: number | null, data: Array<{ __typename?: 'Message', id: string, content: string, createdAt: any, updatedAt: any, author: { __typename?: 'UserLink', id: string, avatar?: string | null, firstName?: string | null, lastName?: string | null }, usersSeen: Array<{ __typename?: 'UserLink', id: string }> }> } };
+export type MessagesQuery = { __typename?: 'Query', messages: { __typename?: 'PaginatedMessages', nextPage?: number | null, data: Array<{ __typename?: 'Message', id: string, content: string, createdAt: any, updatedAt: any, author: { __typename?: 'UserLink', id: string, avatar?: string | null, firstName?: string | null, lastName?: string | null }, usersSeen: Array<{ __typename?: 'UserLink', id: string }> }> } };
 
 export type MyChatsQueryVariables = Exact<{
   filter?: InputMaybe<ChatsFilter>;
@@ -414,10 +441,21 @@ export type UpdateProfileMutationVariables = Exact<{
 
 export type UpdateProfileMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, email: string, authStatus: AuthStatus } };
 
-export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
+export type UserInfoQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, isFriend?: boolean | null }> };
+export type UserInfoQuery = { __typename?: 'Query', user: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, isActive: boolean, lastSeen: string, isFriend: boolean, friends: Array<{ __typename?: 'UserLink', id: string, firstName?: string | null, lastName?: string | null, isActive: boolean, avatar?: string | null, email: string }> } };
+
+export type UsersQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']>;
+  filter?: InputMaybe<UsersFilter>;
+  skip?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'PaginatedUsers', nextPage?: number | null, data: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, isFriend: boolean }> } };
 
 
 export const AddContactDocument = gql`
@@ -500,6 +538,7 @@ export const ContactsDocument = gql`
     lastName
     avatar
     lastSeen
+    isActive
   }
 }
     `;
@@ -612,8 +651,8 @@ export function useMessageUpdatedSubscription(baseOptions: Apollo.SubscriptionHo
 export type MessageUpdatedSubscriptionHookResult = ReturnType<typeof useMessageUpdatedSubscription>;
 export type MessageUpdatedSubscriptionResult = Apollo.SubscriptionResult<MessageUpdatedSubscription>;
 export const MessagesDocument = gql`
-    query messages($id: String!, $filter: MessagesFilter, $page: Int) {
-  messages(id: $id, filter: $filter, page: $page) {
+    query messages($id: String!, $filter: MessagesFilter, $page: Int, $skip: Int) {
+  messages(id: $id, filter: $filter, page: $page, skip: $skip) {
     data {
       id
       content
@@ -649,6 +688,7 @@ export const MessagesDocument = gql`
  *      id: // value for 'id'
  *      filter: // value for 'filter'
  *      page: // value for 'page'
+ *      skip: // value for 'skip'
  *   },
  * });
  */
@@ -981,14 +1021,66 @@ export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
 export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
 export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
-export const UsersDocument = gql`
-    query users {
-  users {
+export const UserInfoDocument = gql`
+    query userInfo($id: String!) {
+  user(id: $id) {
     id
     firstName
     lastName
+    friends {
+      id
+      firstName
+      lastName
+      isActive
+      avatar
+      email
+    }
     avatar
+    isActive
+    lastSeen
     isFriend
+  }
+}
+    `;
+
+/**
+ * __useUserInfoQuery__
+ *
+ * To run a query within a React component, call `useUserInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserInfoQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useUserInfoQuery(baseOptions: Apollo.QueryHookOptions<UserInfoQuery, UserInfoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserInfoQuery, UserInfoQueryVariables>(UserInfoDocument, options);
+      }
+export function useUserInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserInfoQuery, UserInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserInfoQuery, UserInfoQueryVariables>(UserInfoDocument, options);
+        }
+export type UserInfoQueryHookResult = ReturnType<typeof useUserInfoQuery>;
+export type UserInfoLazyQueryHookResult = ReturnType<typeof useUserInfoLazyQuery>;
+export type UserInfoQueryResult = Apollo.QueryResult<UserInfoQuery, UserInfoQueryVariables>;
+export const UsersDocument = gql`
+    query users($page: Int, $filter: UsersFilter, $skip: Int) {
+  users(page: $page, filter: $filter, skip: $skip) {
+    data {
+      id
+      firstName
+      lastName
+      avatar
+      isFriend
+    }
+    nextPage
   }
 }
     `;
@@ -1005,6 +1097,9 @@ export const UsersDocument = gql`
  * @example
  * const { data, loading, error } = useUsersQuery({
  *   variables: {
+ *      page: // value for 'page'
+ *      filter: // value for 'filter'
+ *      skip: // value for 'skip'
  *   },
  * });
  */

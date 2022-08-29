@@ -4,6 +4,7 @@ import { $user } from "../user";
 import {
   fetchMessagesFx,
   fetchMoreMessagesFx,
+  messageSendedFx,
   readMessagesFx,
   sendMessageFx,
 } from "./effects";
@@ -14,6 +15,7 @@ import {
   $messagesError,
   $messagesLoading,
   $messagesPaginationPage,
+  $messagesSkip,
 } from "./state";
 
 $messages
@@ -22,10 +24,11 @@ $messages
   })
   .on(sendMessageFx.doneData, (prev, response) => {
     if (response.data?.createMessage) {
-      return [...prev, response.data?.createMessage];
+      return [response.data?.createMessage, ...prev];
     }
   })
   .on(pushMessage, (prev, message) => [
+    message,
     ...prev.map((mes) => {
       const haveUser = mes.usersSeen?.find(
         (user) => user?.id === message.author?.id
@@ -37,7 +40,6 @@ $messages
           : [...(mes.usersSeen || []), { id: message.author?.id }],
       };
     }),
-    message,
   ])
   .on(updateMessage, (prev, message) => {
     const updatedMessages = [...prev];
@@ -56,15 +58,15 @@ $messages
     return [...prev, ...response.data.messages.data];
   });
 
-$messagesPaginationPage.on(
-  fetchMessagesFx.doneData,
-  (_, response) => response.data.messages.nextPage
-);
-
-$messagesPaginationPage.on(
-  fetchMoreMessagesFx.doneData,
-  (_, response) => response.data.messages.nextPage
-);
+$messagesPaginationPage
+  .on(
+    fetchMessagesFx.doneData,
+    (_, response) => response.data.messages.nextPage
+  )
+  .on(
+    fetchMoreMessagesFx.doneData,
+    (_, response) => response.data.messages.nextPage
+  );
 
 $messagesLoading
   .on(fetchMessagesFx.pending, (_, payload) => payload)
@@ -75,6 +77,10 @@ $messagesError
   .on(sendMessageFx.failData, (_, err) => err);
 
 $fetchMessagesLoading.on(fetchMessagesFx.pending, (_, payload) => payload);
+
+$messagesSkip
+  .on(sendMessageFx.done, (prev) => prev + 1)
+  .on(addMessage, (prev) => prev + 1);
 
 sample({
   clock: addMessage,

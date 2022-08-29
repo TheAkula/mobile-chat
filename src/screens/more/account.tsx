@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export const More = () => {
+export const Account = () => {
   return (
     <View>
-      <Text>More</Text>
+      <Text>Account</Text>
     </View>
   );
 };

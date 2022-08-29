@@ -2,7 +2,6 @@ import { createEffect } from "effector";
 import { useUnit } from "effector-react";
 import { apolloClient } from "src/api";
 import {
-  Message,
   MessagesDocument,
   MessageSendedDocument,
   MessageSendedSubscription,
@@ -40,17 +39,6 @@ export const fetchMoreMessagesFx = createEffect(
       })
       .fetchMore<MessagesQuery>({
         variables,
-        updateQuery(prev, { fetchMoreResult }) {
-          if (!fetchMoreResult) return prev;
-
-          return {
-            ...prev,
-            messages: {
-              data: [...prev.messages.data, ...fetchMoreResult.messages.data],
-              nextPage: fetchMoreResult.messages.nextPage,
-            },
-          };
-        },
       });
   }
 );

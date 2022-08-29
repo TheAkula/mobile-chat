@@ -6,7 +6,6 @@ import {
   MoreHorizontal,
   Header,
 } from "src/components";
-import { AddContactButton } from "src/components/contacts";
 import { Chats, Contacts, More } from "src/screens";
 import { AppTheme } from "src/theme";
 import { MainParamList, MainRoute } from "./types";

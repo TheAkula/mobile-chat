@@ -1,0 +1,19 @@
+query userInfo($id: String!) {
+  user(id: $id) {
+    id
+    firstName
+    lastName
+    friends {
+      id
+      firstName
+      lastName
+      isActive
+      avatar
+      email
+    }
+    avatar
+    isActive
+    lastSeen
+    isFriend
+  }
+}

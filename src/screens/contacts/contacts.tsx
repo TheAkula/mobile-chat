@@ -4,6 +4,7 @@ import { AddContactButton } from "src/components/contacts";
 import { ContactsParamList, ContactsRoute } from "src/navigation/types";
 import { AddContact } from "./add-contact";
 import { MyContacts } from "./my-contacts";
+import { Profile } from "./profile";
 
 const ContactsStack = createStackNavigator<ContactsParamList>();
 
@@ -32,6 +33,7 @@ export const Contacts = () => {
         name={ContactsRoute.AddContact}
         component={AddContact}
       />
+      <ContactsStack.Screen name={ContactsRoute.Profile} component={Profile} />
     </ContactsStack.Navigator>
   );
 };

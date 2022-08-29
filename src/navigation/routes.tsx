@@ -4,11 +4,7 @@ import { Chevron } from "src/components";
 import { Auth, Chat } from "src/screens";
 import { Main } from "./main";
 import { AppTheme } from "src/theme";
-import {
-  useFetchUserInfo,
-  useMessageSendedSubscribe,
-  useUserStore,
-} from "src/models";
+import { useFetchUserInfo, useUserStore } from "src/models";
 import { RootParamList, RootRoute } from "./types";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -22,7 +18,6 @@ export const Routes = () => {
   const { user } = useUserStore();
   const fetchUserInfo = useFetchUserInfo();
   const [isFetched, setIsFetched] = useState(false);
-  const subscribeSendedMessages = useMessageSendedSubscribe();
 
   useEffect(() => {
     AsyncStorage.getItem(AsyncStorageKey.USER_TOKEN).then((token) => {

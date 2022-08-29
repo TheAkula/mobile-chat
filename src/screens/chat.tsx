@@ -16,7 +16,7 @@ type Props = StackScreenProps<RootParamList, RootRoute.Chat>;
 
 export const Chat = ({ route }: Props) => {
   const { chatId } = route.params;
-  const { messages, messagesNextPage } = useMessagesStore();
+  const { messages, messagesNextPage, messagesSkip } = useMessagesStore();
   const loading = useFetchMessagesLoading();
   const fetchMessages = useFetchMessages();
   const fetchMoreMessages = useFetchMoreMessages();
@@ -27,6 +27,7 @@ export const Chat = ({ route }: Props) => {
       fetchMessages({
         id: chatId,
         page: messagesNextPage,
+        skip: messagesSkip,
       });
     }
   }, []);
@@ -38,6 +39,7 @@ export const Chat = ({ route }: Props) => {
       fetchMoreMessages({
         id: chatId,
         page: messagesNextPage,
+        skip: messagesSkip,
       });
     }
   };

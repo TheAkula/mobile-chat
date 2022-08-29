@@ -3,7 +3,7 @@ import { addMyContactFx, removeContactFx } from "../my-contacts";
 import { fetchUsersFx } from "./effects";
 
 $users
-  .on(fetchUsersFx.doneData, (_, data) => data.data.users)
+  .on(fetchUsersFx.doneData, (_, data) => data.data.users.data)
   .on(addMyContactFx.doneData, (prev, response) => {
     const index = prev.findIndex(
       (user) => user.id === response.data?.addFriend.id

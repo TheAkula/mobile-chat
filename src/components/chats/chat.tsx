@@ -1,12 +1,10 @@
 import { TouchableOpacity, View } from "react-native";
 import { Chat as ChatType } from "src/generated/graphql";
 import styled from "styled-components/native";
-import { Avatar } from "src/components";
 import { DeepPartial } from "src/types";
 import { useSetCurrentChat, useUser } from "src/models";
 import {
   CompositeNavigationProp,
-  CompositeScreenProps,
   useNavigation,
 } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -57,7 +55,13 @@ export const Chat = ({ item }: Props) => {
               {item.imgUrl ? (
                 <StyledImage source={{ uri: item.imgUrl }} />
               ) : (
-                <Avatar />
+                <Title>
+                  {item.isFriendsChat
+                    ? [item.friend?.firstName?.[0], item.friend?.lastName?.[0]]
+                        .join("")
+                        .toUpperCase()
+                    : item.name?.[0].toUpperCase()}
+                </Title>
               )}
             </ImageContainer>
             <View>
@@ -98,6 +102,11 @@ const StyledImage = styled.Image`
 
 const ImageContainer = styled.View`
   border-radius: 16px;
+  width: 48px;
+  height: 48px;
+  background-color: ${({ theme }) => theme.colors.blue[2]};
+  justify-content: center;
+  align-items: center;
   margin-right: 12px;
   overflow: hidden;
 `;
@@ -144,4 +153,11 @@ const ContactWrapper = styled.View`
   border-color: ${({ theme }) => theme.colors.blue[6]};
   border-style: solid;
   margin-top: 16px;
+`;
+
+const Title = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.normal};
+  color: ${({ theme }) => theme.colors.white[0]};
+  font-weight: bold;
+  line-height: ${({ theme }) => theme.lineHeights.normal};
 `;

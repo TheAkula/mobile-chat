@@ -7,16 +7,17 @@ interface Props {
   pressed: () => void;
 }
 
-export const ContactBtn = ({ children, pressed }: Props) => {
+export const Btn = ({ children, pressed }: Props) => {
   return (
     <TouchableOpacity onPress={pressed}>
-      <Btn>{children}</Btn>
+      <Button>{children}</Button>
     </TouchableOpacity>
   );
 };
 
-const Btn = styled.View`
+const Button = styled.View`
   background-color: ${({ theme }) => theme.colors.blue[2]};
   border-radius: 6px;
   padding: 5px 10px;
+  align-items: center;
 `;

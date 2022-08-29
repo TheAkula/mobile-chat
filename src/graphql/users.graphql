@@ -1,9 +1,12 @@
-query users {
-  users {
-    id
-    firstName
-    lastName
-    avatar
-    isFriend
+query users($page: Int, $filter: UsersFilter, $skip: Int) {
+  users(page: $page, filter: $filter, skip: $skip) {
+    data {
+      id
+      firstName
+      lastName
+      avatar
+      isFriend
+    }
+    nextPage
   }
 }
