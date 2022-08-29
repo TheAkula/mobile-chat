@@ -1,0 +1,20 @@
+subscription messageSended($userId: String!) {
+  messageCreated(userId: $userId) {
+    id
+    author {
+      id
+      firstName
+      lastName
+      avatar
+    }
+    content
+    chat {
+      id
+    }
+    createdAt
+    updatedAt
+    usersSeen {
+      id
+    }
+  }
+}

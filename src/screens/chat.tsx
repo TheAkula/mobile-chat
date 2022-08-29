@@ -3,7 +3,12 @@ import { useEffect } from "react";
 import { Text, View } from "react-native";
 import { MessagesList } from "src/components/chats";
 import { ChatInput } from "src/components/chats/chat-input";
-import { useFetchMessages, useMessagesStore } from "src/models";
+import {
+  useFetchMessages,
+  useFetchMessagesLoading,
+  useFetchMoreMessages,
+  useMessagesStore,
+} from "src/models";
 import { RootParamList, RootRoute } from "src/navigation/types";
 import styled from "styled-components/native";
 
@@ -11,19 +16,33 @@ type Props = StackScreenProps<RootParamList, RootRoute.Chat>;
 
 export const Chat = ({ route }: Props) => {
   const { chatId } = route.params;
-
-  const { messages, messagesLoading } = useMessagesStore();
+  const { messages, messagesNextPage } = useMessagesStore();
+  const loading = useFetchMessagesLoading();
   const fetchMessages = useFetchMessages();
+  const fetchMoreMessages = useFetchMoreMessages();
 
   useEffect(() => {
     if (!messages || !messages.length) {
+      console.log(messagesNextPage, chatId);
       fetchMessages({
         id: chatId,
+        page: messagesNextPage,
       });
     }
   }, []);
 
-  if (!messages || messagesLoading) {
+  const onEndReached = () => {
+    if (messagesNextPage) {
+      console.log(messagesNextPage, chatId);
+
+      fetchMoreMessages({
+        id: chatId,
+        page: messagesNextPage,
+      });
+    }
+  };
+
+  if (!messages || loading) {
     return (
       <View>
         <Text>Loading...</Text>
@@ -33,8 +52,8 @@ export const Chat = ({ route }: Props) => {
 
   return (
     <Container>
-      <MessagesList messages={[...messages].reverse()} />
-      <ChatInput />
+      <MessagesList messages={messages} endReached={onEndReached} />
+      <ChatInput chatId={chatId} />
     </Container>
   );
 };

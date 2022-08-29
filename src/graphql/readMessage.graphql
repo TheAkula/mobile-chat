@@ -1,0 +1,8 @@
+mutation readMessages($messagesIds: [String!]!) {
+  readMessages(messagesIds: $messagesIds) {
+    id
+    chat {
+      id
+    }
+  }
+}

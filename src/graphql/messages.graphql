@@ -1,16 +1,20 @@
-query messages($id: String!) {
-  messages(id: $id) {
-    id
-    content
-    author {
+query messages($id: String!, $filter: MessagesFilter, $page: Int) {
+  messages(id: $id, filter: $filter, page: $page) {
+    data {
       id
-      avatar
-      firstName
-      lastName
+      content
+      author {
+        id
+        avatar
+        firstName
+        lastName
+      }
+      createdAt
+      updatedAt
+      usersSeen {
+        id
+      }
     }
-    createdAt
-    updatedAt
-    isRead
-    isMyRead
+    nextPage
   }
 }

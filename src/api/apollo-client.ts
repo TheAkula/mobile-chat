@@ -1,6 +1,7 @@
 import {
   ApolloClient,
   createHttpLink,
+  from,
   InMemoryCache,
   split,
 } from "@apollo/client";
@@ -18,16 +19,20 @@ const httpLink = createHttpLink({
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://localhost:4000/graphql",
+    url: "ws://192.168.1.247:4000/graphql",
     shouldRetry(errOrCloseEvent) {
+      // console.log(errOrCloseEvent);
+
       return true;
     },
     connectionParams: async () => {
       const userToken = await AsyncStorage.getItem(AsyncStorageKey.USER_TOKEN);
-      return {
+      const params = {
         isWebSocket: true,
         authorization: "Bearer " + userToken,
       };
+
+      return params;
     },
   })
 );
@@ -56,6 +61,7 @@ const errorLink = onError(({ networkError, graphQLErrors }) => {
 const link = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
+
     return (
       definition.kind === "OperationDefinition" &&
       definition.operation === "subscription"
@@ -66,6 +72,26 @@ const link = split(
 );
 
 export const apolloClient = new ApolloClient({
-  cache: new InMemoryCache(),
-  link: authLink.concat(errorLink).concat(link),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          messages: {
+            keyArgs: ["filter"],
+
+            merge(existing = { data: [], nextPage: 0 }, incoming) {
+              console.log(existing.data.length, incoming.data.length);
+
+              return {
+                ...existing,
+                data: [...existing.data, ...incoming.data],
+                nextPage: incoming.nextPage,
+              };
+            },
+          },
+        },
+      },
+    },
+  }),
+  link: from([authLink, errorLink, link]),
 });

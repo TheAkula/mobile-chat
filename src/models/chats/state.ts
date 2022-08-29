@@ -15,4 +15,6 @@ export const $chatsStore = combine({
   myError: $chatsError,
 });
 
+export const $currentChat = createStore("");
+
 export const useMyChatsStore = () => useStore($chatsStore);

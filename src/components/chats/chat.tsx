@@ -3,7 +3,7 @@ import { Chat as ChatType } from "src/generated/graphql";
 import styled from "styled-components/native";
 import { Avatar } from "src/components";
 import { DeepPartial } from "src/types";
-import { useUser } from "src/models";
+import { useSetCurrentChat, useUser } from "src/models";
 import {
   CompositeNavigationProp,
   CompositeScreenProps,
@@ -35,8 +35,11 @@ type NavProp = CompositeNavigationProp<
 export const Chat = ({ item }: Props) => {
   const user = useUser();
   const { push } = useNavigation<NavProp>();
+  const setCurrentChat = useSetCurrentChat();
 
   const handlePress = () => {
+    setCurrentChat(item.id || "");
+
     push(RootRoute.Chat, {
       name: item.isFriendsChat
         ? [item.friend?.firstName, item.friend?.lastName].join(" ")

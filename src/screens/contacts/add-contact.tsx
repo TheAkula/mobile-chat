@@ -43,8 +43,6 @@ export const AddContact = () => {
     );
   }
 
-  console.log(users);
-
   return (
     <View>
       <Container>

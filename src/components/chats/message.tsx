@@ -3,12 +3,13 @@ import { DeepPartial } from "src/types";
 import { getDateHm } from "src/utils";
 import styled, { css } from "styled-components/native";
 import { ifProp } from "styled-tools";
+import { MessageToShow } from "./types";
 
 type WithIsMine = {
   isMine?: boolean;
 };
 
-type Props = DeepPartial<MessageType> & WithIsMine;
+type Props = MessageToShow & WithIsMine;
 
 export const Message = ({
   isMine,
@@ -47,6 +48,9 @@ const MessageContainer = styled.View<WithIsMine>`
   )}
   align-self: ${ifProp("isMine", "flex-end", "flex-start")};
   margin-bottom: 12px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  max-width: 80%;
 `;
 
 const MessageText = styled.Text`
@@ -61,5 +65,15 @@ const MessageDate = styled.Text<WithIsMine>`
     ifProp("isMine", theme.colors.white[0], theme.colors.white[2])};
   font-size: ${({ theme }) => theme.fontSizes.superSmall};
   line-height: ${({ theme }) => theme.lineHeights.superSmall};
-  align-self: ${ifProp("isMine", "flex-end", "flex-start")};
+  align-self: flex-end;
+  margin-bottom: -6px;
+  ${ifProp(
+    "isMine",
+    css`
+      margin-left: auto;
+    `,
+    css`
+      margin-right: auto;
+    `
+  )}
 `;

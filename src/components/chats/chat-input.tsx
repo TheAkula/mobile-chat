@@ -3,9 +3,28 @@ import styled from "styled-components/native";
 import { Plus, Input, Send } from "src/components";
 import { useState } from "react";
 import { AppTheme } from "src/theme";
+import { useSendMessage } from "src/models";
 
-export const ChatInput = () => {
+interface Props {
+  chatId: string;
+}
+
+export const ChatInput = ({ chatId }: Props) => {
   const [message, setMessage] = useState("");
+  const sendMessage = useSendMessage();
+
+  const handleSend = async () => {
+    if (message) {
+      try {
+        await sendMessage({
+          content: message,
+          chatId,
+        });
+      } finally {
+        setMessage("");
+      }
+    }
+  };
 
   return (
     <InputContainer>
@@ -20,7 +39,7 @@ export const ChatInput = () => {
         placeholder="Message"
         placeholderTextColor={AppTheme.colors.white[2]}
       />
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleSend}>
         <SendContainer>
           <Send />
         </SendContainer>

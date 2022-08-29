@@ -1,0 +1,11 @@
+subscription messageUpdated($userId: String!) {
+  messageUpdated(userId: $userId) {
+    id
+    content
+    createdAt
+    updatedAt
+    usersSeen {
+      id
+    }
+  }
+}

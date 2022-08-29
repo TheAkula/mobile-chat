@@ -1,3 +1,5 @@
+import { forward, sample } from "effector";
+import { messageSendedFx } from "../messages";
 import { $usersError } from "../users";
 import { updateProfileFx, fetchUserInfoFX } from "./effects";
 import { $user, $userLoading } from "./state";
@@ -39,3 +41,9 @@ $userLoading
 $usersError
   .on(fetchUserInfoFX.failData, (_, err) => err)
   .on(updateProfileFx.failData, (_, err) => err);
+
+sample({
+  clock: fetchUserInfoFX.doneData,
+  fn: (response) => ({ userId: response.data.myUserInfo.id }),
+  target: messageSendedFx,
+});
