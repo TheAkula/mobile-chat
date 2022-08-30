@@ -6,3 +6,4 @@ export { Button } from "./button";
 export { TabBarButton } from "./tabBar-button";
 export { SearchInput } from "./search";
 export { Btn } from "./btn";
+export { ImagePicker } from "./image-picker";

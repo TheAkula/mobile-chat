@@ -14,7 +14,7 @@ import { DeepPartial } from "src/types";
 import { getMonth } from "src/utils";
 import { Message } from "./message";
 import { MessagesListHeader } from "./messges-list-header";
-import { MessageToShow } from "./types";
+import { MessageToShow } from "../chats/types";
 
 interface Props {
   messages: DeepPartial<MessageType>[];

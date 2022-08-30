@@ -23,5 +23,6 @@ export const updateProfileFx = createEffect(
     });
   }
 );
+
 export const useFetchUserInfo = () => useUnit(fetchUserInfoFX);
 export const useUpdateProfile = () => useUnit(updateProfileFx);

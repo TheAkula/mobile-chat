@@ -30,6 +30,7 @@ export enum AuthStatus {
 
 export type Chat = {
   __typename?: 'Chat';
+  admin: UserLink;
   friend?: Maybe<UserLink>;
   id: Scalars['String'];
   imgUrl?: Maybe<Scalars['String']>;
@@ -94,6 +95,7 @@ export type MessagesFilter = {
 export type Mutation = {
   __typename?: 'Mutation';
   addFriend: User;
+  addToChat: User;
   confirmSignUpWith2fa: UserWithAuth;
   createChat: Chat;
   createMessage: Message;
@@ -103,6 +105,7 @@ export type Mutation = {
   login: Auth;
   readMessages: Array<Message>;
   removeFriend: Scalars['String'];
+  removeFromChat: User;
   signUp: UserWithAuth;
   signUpWith2fa: TwoFactorAuth;
   upateMessage: Message;
@@ -115,6 +118,12 @@ export type MutationAddFriendArgs = {
 };
 
 
+export type MutationAddToChatArgs = {
+  chatId: Scalars['String'];
+  userId: Scalars['String'];
+};
+
+
 export type MutationConfirmSignUpWith2faArgs = {
   code: Scalars['Int'];
   counter: Scalars['Int'];
@@ -122,7 +131,9 @@ export type MutationConfirmSignUpWith2faArgs = {
 
 
 export type MutationCreateChatArgs = {
-  name?: InputMaybe<Scalars['String']>;
+  image?: InputMaybe<Scalars['String']>;
+  imageExt?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
 };
 
 
@@ -160,6 +171,12 @@ export type MutationReadMessagesArgs = {
 
 export type MutationRemoveFriendArgs = {
   id: Scalars['String'];
+};
+
+
+export type MutationRemoveFromChatArgs = {
+  chatId: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 
@@ -221,6 +238,7 @@ export type PaginatedUsers = {
 
 export type Query = {
   __typename?: 'Query';
+  chat: Chat;
   messages: PaginatedMessages;
   myChats: Array<Chat>;
   myFriends: Array<User>;
@@ -228,6 +246,11 @@ export type Query = {
   myUserInfo: User;
   user: User;
   users: PaginatedUsers;
+};
+
+
+export type QueryChatArgs = {
+  chatId: Scalars['String'];
 };
 
 
@@ -344,6 +367,21 @@ export type AddContactMutationVariables = Exact<{
 
 export type AddContactMutation = { __typename?: 'Mutation', addFriend: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, isActive: boolean, lastSeen: string, avatar?: string | null } };
 
+export type AddToChatMutationVariables = Exact<{
+  userId: Scalars['String'];
+  chatId: Scalars['String'];
+}>;
+
+
+export type AddToChatMutation = { __typename?: 'Mutation', addToChat: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, email: string } };
+
+export type ChatQueryVariables = Exact<{
+  chatId: Scalars['String'];
+}>;
+
+
+export type ChatQuery = { __typename?: 'Query', chat: { __typename?: 'Chat', id: string, users: Array<{ __typename?: 'UserLink', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, email: string }>, admin: { __typename?: 'UserLink', id: string } } };
+
 export type ConfirmSignUpWith2faMutationVariables = Exact<{
   code: Scalars['Int'];
   counter: Scalars['Int'];
@@ -356,6 +394,15 @@ export type ContactsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ContactsQuery = { __typename?: 'Query', myFriends: Array<{ __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, lastSeen: string, isActive: boolean }> };
+
+export type CreateChatMutationVariables = Exact<{
+  name: Scalars['String'];
+  image?: InputMaybe<Scalars['String']>;
+  imageExt?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type CreateChatMutation = { __typename?: 'Mutation', createChat: { __typename?: 'Chat', id: string, name?: string | null, isFriendsChat: boolean, imgUrl?: string | null } };
 
 export type MessageSendedSubscriptionVariables = Exact<{
   userId: Scalars['String'];
@@ -406,6 +453,14 @@ export type RemoveContactMutationVariables = Exact<{
 
 
 export type RemoveContactMutation = { __typename?: 'Mutation', removeFriend: string };
+
+export type RemoveFromChatMutationVariables = Exact<{
+  userId: Scalars['String'];
+  chatId: Scalars['String'];
+}>;
+
+
+export type RemoveFromChatMutation = { __typename?: 'Mutation', removeFromChat: { __typename?: 'User', id: string } };
 
 export type SendMessageMutationVariables = Exact<{
   content: Scalars['String'];
@@ -496,6 +551,89 @@ export function useAddContactMutation(baseOptions?: Apollo.MutationHookOptions<A
 export type AddContactMutationHookResult = ReturnType<typeof useAddContactMutation>;
 export type AddContactMutationResult = Apollo.MutationResult<AddContactMutation>;
 export type AddContactMutationOptions = Apollo.BaseMutationOptions<AddContactMutation, AddContactMutationVariables>;
+export const AddToChatDocument = gql`
+    mutation addToChat($userId: String!, $chatId: String!) {
+  addToChat(userId: $userId, chatId: $chatId) {
+    id
+    firstName
+    lastName
+    avatar
+    email
+  }
+}
+    `;
+export type AddToChatMutationFn = Apollo.MutationFunction<AddToChatMutation, AddToChatMutationVariables>;
+
+/**
+ * __useAddToChatMutation__
+ *
+ * To run a mutation, you first call `useAddToChatMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddToChatMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addToChatMutation, { data, loading, error }] = useAddToChatMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      chatId: // value for 'chatId'
+ *   },
+ * });
+ */
+export function useAddToChatMutation(baseOptions?: Apollo.MutationHookOptions<AddToChatMutation, AddToChatMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddToChatMutation, AddToChatMutationVariables>(AddToChatDocument, options);
+      }
+export type AddToChatMutationHookResult = ReturnType<typeof useAddToChatMutation>;
+export type AddToChatMutationResult = Apollo.MutationResult<AddToChatMutation>;
+export type AddToChatMutationOptions = Apollo.BaseMutationOptions<AddToChatMutation, AddToChatMutationVariables>;
+export const ChatDocument = gql`
+    query chat($chatId: String!) {
+  chat(chatId: $chatId) {
+    id
+    users {
+      id
+      firstName
+      lastName
+      avatar
+      email
+    }
+    admin {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useChatQuery__
+ *
+ * To run a query within a React component, call `useChatQuery` and pass it any options that fit your needs.
+ * When your component renders, `useChatQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useChatQuery({
+ *   variables: {
+ *      chatId: // value for 'chatId'
+ *   },
+ * });
+ */
+export function useChatQuery(baseOptions: Apollo.QueryHookOptions<ChatQuery, ChatQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ChatQuery, ChatQueryVariables>(ChatDocument, options);
+      }
+export function useChatLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ChatQuery, ChatQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ChatQuery, ChatQueryVariables>(ChatDocument, options);
+        }
+export type ChatQueryHookResult = ReturnType<typeof useChatQuery>;
+export type ChatLazyQueryHookResult = ReturnType<typeof useChatLazyQuery>;
+export type ChatQueryResult = Apollo.QueryResult<ChatQuery, ChatQueryVariables>;
 export const ConfirmSignUpWith2faDocument = gql`
     mutation confirmSignUpWith2fa($code: Int!, $counter: Int!) {
   confirmSignUpWith2fa(code: $code, counter: $counter) {
@@ -569,6 +707,44 @@ export function useContactsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<C
 export type ContactsQueryHookResult = ReturnType<typeof useContactsQuery>;
 export type ContactsLazyQueryHookResult = ReturnType<typeof useContactsLazyQuery>;
 export type ContactsQueryResult = Apollo.QueryResult<ContactsQuery, ContactsQueryVariables>;
+export const CreateChatDocument = gql`
+    mutation createChat($name: String!, $image: String, $imageExt: String) {
+  createChat(name: $name, image: $image, imageExt: $imageExt) {
+    id
+    name
+    isFriendsChat
+    imgUrl
+  }
+}
+    `;
+export type CreateChatMutationFn = Apollo.MutationFunction<CreateChatMutation, CreateChatMutationVariables>;
+
+/**
+ * __useCreateChatMutation__
+ *
+ * To run a mutation, you first call `useCreateChatMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateChatMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createChatMutation, { data, loading, error }] = useCreateChatMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      image: // value for 'image'
+ *      imageExt: // value for 'imageExt'
+ *   },
+ * });
+ */
+export function useCreateChatMutation(baseOptions?: Apollo.MutationHookOptions<CreateChatMutation, CreateChatMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateChatMutation, CreateChatMutationVariables>(CreateChatDocument, options);
+      }
+export type CreateChatMutationHookResult = ReturnType<typeof useCreateChatMutation>;
+export type CreateChatMutationResult = Apollo.MutationResult<CreateChatMutation>;
+export type CreateChatMutationOptions = Apollo.BaseMutationOptions<CreateChatMutation, CreateChatMutationVariables>;
 export const MessageSendedDocument = gql`
     subscription messageSended($userId: String!) {
   messageCreated(userId: $userId) {
@@ -862,6 +1038,40 @@ export function useRemoveContactMutation(baseOptions?: Apollo.MutationHookOption
 export type RemoveContactMutationHookResult = ReturnType<typeof useRemoveContactMutation>;
 export type RemoveContactMutationResult = Apollo.MutationResult<RemoveContactMutation>;
 export type RemoveContactMutationOptions = Apollo.BaseMutationOptions<RemoveContactMutation, RemoveContactMutationVariables>;
+export const RemoveFromChatDocument = gql`
+    mutation removeFromChat($userId: String!, $chatId: String!) {
+  removeFromChat(userId: $userId, chatId: $chatId) {
+    id
+  }
+}
+    `;
+export type RemoveFromChatMutationFn = Apollo.MutationFunction<RemoveFromChatMutation, RemoveFromChatMutationVariables>;
+
+/**
+ * __useRemoveFromChatMutation__
+ *
+ * To run a mutation, you first call `useRemoveFromChatMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveFromChatMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeFromChatMutation, { data, loading, error }] = useRemoveFromChatMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      chatId: // value for 'chatId'
+ *   },
+ * });
+ */
+export function useRemoveFromChatMutation(baseOptions?: Apollo.MutationHookOptions<RemoveFromChatMutation, RemoveFromChatMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveFromChatMutation, RemoveFromChatMutationVariables>(RemoveFromChatDocument, options);
+      }
+export type RemoveFromChatMutationHookResult = ReturnType<typeof useRemoveFromChatMutation>;
+export type RemoveFromChatMutationResult = Apollo.MutationResult<RemoveFromChatMutation>;
+export type RemoveFromChatMutationOptions = Apollo.BaseMutationOptions<RemoveFromChatMutation, RemoveFromChatMutationVariables>;
 export const SendMessageDocument = gql`
     mutation sendMessage($content: String!, $chatId: String!) {
   createMessage(content: $content, chatId: $chatId) {

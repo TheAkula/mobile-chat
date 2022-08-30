@@ -9,6 +9,7 @@ import {
 } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import {
+  ChatRoute,
   ChatsParamsList,
   ChatsRoute,
   MainParamList,
@@ -39,10 +40,13 @@ export const Chat = ({ item }: Props) => {
     setCurrentChat(item.id || "");
 
     push(RootRoute.Chat, {
-      name: item.isFriendsChat
-        ? [item.friend?.firstName, item.friend?.lastName].join(" ")
-        : item.name || "",
-      chatId: item.id || "",
+      screen: ChatRoute.Messages,
+      params: {
+        name: item.isFriendsChat
+          ? [item.friend?.firstName, item.friend?.lastName].join(" ")
+          : item.name || "",
+        chatId: item.id || "",
+      },
     });
   };
 
@@ -72,14 +76,16 @@ export const Chat = ({ item }: Props) => {
                     )
                   : item.name}
               </Name>
-              <Status>
-                {user?.id === item.messages?.[0]?.author?.id
-                  ? "You"
-                  : !item.isFriendsChat
-                  ? item.messages?.[0]?.author?.firstName
-                  : ""}
-                : {item.messages?.[0]?.content}
-              </Status>
+              {!!item.messages?.length && (
+                <Status>
+                  {user?.id === item.messages?.[0]?.author?.id
+                    ? "You"
+                    : !item.isFriendsChat
+                    ? item.messages?.[0]?.author?.firstName
+                    : ""}
+                  : {item.messages?.[0]?.content}
+                </Status>
+              )}
             </View>
           </Wrapper>
           <Wrapper>

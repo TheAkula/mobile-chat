@@ -9,6 +9,8 @@ interface Props {
   remove?: (id: string) => void;
   send?: (id: string) => void;
   endReached?: () => void;
+  isAdd?: (item: Partial<User>) => boolean;
+  isRemove?: (item: Partial<User>) => boolean;
 }
 
 export const ContactsList = ({
@@ -17,9 +19,20 @@ export const ContactsList = ({
   remove,
   send,
   endReached,
+  isAdd,
+  isRemove,
 }: Props) => {
   const renderItem: ListRenderItem<Partial<User>> = ({ item }) => {
-    return <Contact item={item} add={add} remove={remove} send={send} />;
+    return (
+      <Contact
+        item={item}
+        add={add}
+        remove={remove}
+        send={send}
+        isAdd={isAdd}
+        isRemove={isRemove}
+      />
+    );
   };
 
   if (!contacts.length) {

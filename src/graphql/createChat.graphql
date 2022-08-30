@@ -1,0 +1,8 @@
+mutation createChat($name: String!, $image: String, $imageExt: String) {
+  createChat(name: $name, image: $image, imageExt: $imageExt) {
+    id
+    name
+    isFriendsChat
+    imgUrl
+  }
+}

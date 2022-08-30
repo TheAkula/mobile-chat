@@ -20,7 +20,7 @@ type Props = {
 export const Header = ({ back, buttons, options, route }: Props) => {
   const { goBack } = useNavigation();
 
-  const title = getTitle(getHeaderTitle(options, route.name));
+  const title = options.title || getTitle(getHeaderTitle(options, route.name));
 
   const handlePress = () => {
     goBack();

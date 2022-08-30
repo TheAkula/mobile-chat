@@ -1,4 +1,4 @@
-import { forward, sample } from "effector";
+import { sample } from "effector";
 import { messageSendedFx } from "../messages";
 import { $usersError } from "../users";
 import { updateProfileFx, fetchUserInfoFX } from "./effects";

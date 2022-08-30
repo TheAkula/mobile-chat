@@ -1,7 +1,7 @@
 import { TouchableOpacity, View } from "react-native";
 import { User } from "src/generated/graphql";
 import styled from "styled-components/native";
-import { Avatar, Plus, Btn } from "src/components";
+import { Plus, Btn } from "src/components";
 import {
   CompositeNavigationProp,
   useNavigation,
@@ -24,6 +24,8 @@ interface Props {
   add?: (id: string) => void;
   remove?: (id: string) => void;
   send?: (id: string) => void;
+  isAdd?: (item: Partial<User>) => boolean;
+  isRemove?: (item: Partial<User>) => boolean;
 }
 
 type NavProp = CompositeNavigationProp<
@@ -34,7 +36,7 @@ type NavProp = CompositeNavigationProp<
   >
 >;
 
-export const Contact = ({ item, add, remove }: Props) => {
+export const Contact = ({ item, add, remove, isAdd, isRemove }: Props) => {
   const { push } = useNavigation<NavProp>();
   const user = useUser();
 
@@ -67,6 +69,9 @@ export const Contact = ({ item, add, remove }: Props) => {
     }
   };
 
+  const itemHasAdd = isAdd && isAdd(item);
+  const itemHasRemove = isRemove && isRemove(item);
+
   return (
     <TouchableOpacity onPress={handlePress}>
       <ContactWrapper>
@@ -92,7 +97,7 @@ export const Contact = ({ item, add, remove }: Props) => {
             </View>
           </Wrapper>
           <Wrapper>
-            {!isMe && add && !item.isFriend && (
+            {!isMe && add && itemHasAdd && (
               <Btn pressed={addPressed}>
                 <Wrapper>
                   <BtnContainer>
@@ -103,7 +108,7 @@ export const Contact = ({ item, add, remove }: Props) => {
               </Btn>
             )}
 
-            {!isMe && remove && item.isFriend && (
+            {!isMe && remove && itemHasRemove && (
               <Btn pressed={removePressed}>
                 <BtnText>Remove</BtnText>
               </Btn>

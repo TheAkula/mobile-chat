@@ -1,6 +1,6 @@
 import { forward, sample } from "effector";
 import { addMessage, readMessagesFx, sendMessageFx } from "../messages";
-import { fetchMyChatsFx } from "./effects";
+import { createChatFx, fetchMyChatsFx } from "./effects";
 import { receiveMessage, setCurrentChat } from "./events";
 import { $chats, $chatsError, $chatsLoading, $currentChat } from "./state";
 
@@ -25,6 +25,9 @@ $chats
     }
   })
   .on(sendMessageFx.done, (prev, { params, result }) => {
+    if (!result.data?.createMessage) {
+      return prev;
+    }
     const updatedChatIndex = prev.findIndex(
       (chat) => chat.id === params.chatId
     );
@@ -55,6 +58,11 @@ $chats
       notSeen: notSeen ? notSeen - params.messagesIds.length : 0,
     };
     return updatedChats;
+  })
+  .on(createChatFx.doneData, (prev, response) => {
+    if (response.data?.createChat) {
+      return [...prev, response.data?.createChat];
+    }
   });
 
 $chatsLoading.on(fetchMyChatsFx.pending, (_, payload) => payload);

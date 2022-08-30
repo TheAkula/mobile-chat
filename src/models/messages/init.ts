@@ -4,8 +4,8 @@ import { $user } from "../user";
 import {
   fetchMessagesFx,
   fetchMoreMessagesFx,
-  messageSendedFx,
   readMessagesFx,
+  refetchMessagesFx,
   sendMessageFx,
 } from "./effects";
 import { addMessage, pushMessage, updateMessage } from "./events";
@@ -56,6 +56,9 @@ $messages
   })
   .on(fetchMoreMessagesFx.doneData, (prev, response) => {
     return [...prev, ...response.data.messages.data];
+  })
+  .on(refetchMessagesFx.doneData, (_, response) => {
+    console.log(response);
   });
 
 $messagesPaginationPage
@@ -90,7 +93,7 @@ sample({
   },
   fn: (_, message) => message,
   filter({ currentChat, user }, message) {
-    return currentChat === message.chat?.id && user?.id !== message.author?.id;
+    return currentChat === message.chat?.id;
   },
   target: pushMessage,
 });

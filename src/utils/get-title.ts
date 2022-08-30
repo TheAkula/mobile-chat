@@ -1,4 +1,9 @@
-import { AuthRoute, ContactsRoute, MainRoute } from "src/navigation/types";
+import {
+  AuthRoute,
+  ChatsRoute,
+  ContactsRoute,
+  MainRoute,
+} from "src/navigation/types";
 
 export const getTitle = (title: string) => {
   switch (title) {
@@ -14,6 +19,10 @@ export const getTitle = (title: string) => {
       return "Add Contact";
     case ContactsRoute.MyContacts:
       return "Contacts";
+    case ChatsRoute.MyChats:
+      return "Chats";
+    case ChatsRoute.AddChat:
+      return "Add Chat";
     default:
       return "";
   }

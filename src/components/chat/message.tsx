@@ -3,7 +3,7 @@ import { DeepPartial } from "src/types";
 import { getDateHm } from "src/utils";
 import styled, { css } from "styled-components/native";
 import { ifProp } from "styled-tools";
-import { MessageToShow } from "./types";
+import { MessageToShow } from "../chats/types";
 
 type WithIsMine = {
   isMine?: boolean;

@@ -5,3 +5,4 @@ export * from "./users";
 export * from "./chats";
 export * from "./messages";
 export * from "./contact";
+export * from "./chat";

@@ -77,7 +77,7 @@ export const apolloClient = new ApolloClient({
       Query: {
         fields: {
           messages: {
-            keyArgs: ["filter"],
+            keyArgs: ["filter", "id"],
 
             merge(existing = { data: [], nextPage: 0 }, incoming) {
               return {

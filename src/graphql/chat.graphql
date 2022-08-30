@@ -1,0 +1,15 @@
+query chat($chatId: String!) {
+  chat(chatId: $chatId) {
+    id
+    users {
+      id
+      firstName
+      lastName
+      avatar
+      email
+    }
+    admin {
+      id
+    }
+  }
+}

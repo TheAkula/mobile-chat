@@ -9,12 +9,14 @@ export const $chatsLoading = createStore(false);
 
 export const $chatsError = createStore<Error | null>(null);
 
+export const $currentChat = createStore("");
+
 export const $chatsStore = combine({
   myChats: $chats,
   myChatsLoading: $chatsLoading,
   myError: $chatsError,
+  currentChat: $currentChat,
 });
 
-export const $currentChat = createStore("");
-
 export const useMyChatsStore = () => useStore($chatsStore);
+export const useCurrentChat = () => useStore($currentChat);

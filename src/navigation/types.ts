@@ -36,10 +36,15 @@ export enum MoreRoute {
   Account = "Account",
 }
 
+export enum ChatRoute {
+  Messages = "Messages",
+  Invite = "Invite",
+}
+
 export type RootParamList = {
   [RootRoute.Auth]: NavigatorScreenParams<AuthParamList>;
   [RootRoute.Main]: NavigatorScreenParams<MainParamList>;
-  [RootRoute.Chat]: { name: string; chatId: string };
+  [RootRoute.Chat]: NavigatorScreenParams<ChatParamsList>;
 };
 
 export type AuthParamList = {
@@ -70,4 +75,9 @@ export type ChatsParamsList = {
 
 export type MoreParamsList = {
   [MoreRoute.Account]: undefined;
+};
+
+export type ChatParamsList = {
+  [ChatRoute.Invite]: undefined;
+  [ChatRoute.Messages]: { name: string; chatId: string };
 };

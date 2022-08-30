@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { Container, SearchInput } from "src/components";
 import { ContactsList } from "src/components/contacts";
+import { User } from "src/generated/graphql";
 import {
   useAddMyContact,
   useFetchMoreUsers,
@@ -63,6 +64,13 @@ export const AddContact = () => {
     }, 1000)();
   };
 
+  const isAdd = (item: Partial<User>) => {
+    return !item.isFriend;
+  };
+  const isRemove = (item: Partial<User>) => {
+    return !!item.isFriend;
+  };
+
   return (
     <View>
       <Container>
@@ -76,6 +84,8 @@ export const AddContact = () => {
         <ContactsList
           contacts={users}
           add={addedContact}
+          isAdd={isAdd}
+          isRemove={isRemove}
           remove={removedContact}
           endReached={onEndReached}
         />

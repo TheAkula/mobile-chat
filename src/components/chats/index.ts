@@ -1,2 +1,2 @@
 export { ChatsList } from "./chats-list";
-export { MessagesList } from "./messages-list";
+export { AddChatButton } from "./add-chat-button";

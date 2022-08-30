@@ -1,0 +1,9 @@
+mutation addToChat($userId: String!, $chatId: String!) {
+  addToChat(userId: $userId, chatId: $chatId) {
+    id
+    firstName
+    lastName
+    avatar
+    email
+  }
+}

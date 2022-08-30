@@ -11,6 +11,7 @@ import {
 import { ContactsList } from "src/components/contacts";
 import { ContactsParamList, ContactsRoute } from "src/navigation/types";
 import styled from "styled-components/native";
+import { User } from "src/generated/graphql";
 
 type Props = StackScreenProps<ContactsParamList, ContactsRoute.Profile>;
 
@@ -40,6 +41,13 @@ export const Profile = ({ route }: Props) => {
   };
 
   const sendPressed = () => {};
+
+  const isAdd = (item: Partial<User>) => {
+    return !item.isFriend;
+  };
+  const isRemove = (item: Partial<User>) => {
+    return !!item.isFriend;
+  };
 
   if (!contact || contactLoading) {
     return (
@@ -88,6 +96,8 @@ export const Profile = ({ route }: Props) => {
       <Header>Friends</Header>
       <ContactsList
         contacts={contact.friends || []}
+        isAdd={isAdd}
+        isRemove={isRemove}
         add={addPressed}
         remove={removePressed}
         send={sendPressed}

@@ -1,6 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar, Text, View } from "react-native";
-import { Chevron } from "src/components";
+import { Chevron, Header } from "src/components";
 import { Auth, Chat } from "src/screens";
 import { Main } from "./main";
 import { AppTheme } from "src/theme";

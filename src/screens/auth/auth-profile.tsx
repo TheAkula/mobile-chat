@@ -5,7 +5,14 @@ import {
   MediaTypeOptions,
 } from "expo-image-picker";
 import styled from "styled-components/native";
-import { Plus, Avatar, Input, Container, Button } from "src/components";
+import {
+  Plus,
+  Avatar,
+  Input,
+  Container,
+  Button,
+  ImagePicker,
+} from "src/components";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { AuthProfileForm } from "src/types";
@@ -39,19 +46,6 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
   });
   const updateProfile = useUpdateProfile();
   const [img, setImg] = useState<ImageInfo | null>(null);
-  const handlePress = async () => {
-    const img = await launchImageLibraryAsync({
-      mediaTypes: MediaTypeOptions.Images,
-      base64: true,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (img.cancelled === false) {
-      setImg(img);
-    }
-  };
 
   const onSubmited = async (data: AuthProfileForm) => {
     await updateProfile({
@@ -66,17 +60,12 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
   return (
     <AuthContainer>
       <ProfileContainer>
-        <ImagePickerContainer onPress={handlePress} hasImage={!!img?.uri}>
-          {img?.uri ? (
-            <Image source={{ uri: img.uri, width: 100, height: 100 }} />
-          ) : (
-            <>
-              <Avatar width={56} height={56} />
-              <ImagePickerPlus>
-                <Plus />
-              </ImagePickerPlus>
-            </>
-          )}
+        <ImagePickerContainer>
+          <ImagePicker
+            image={img}
+            setImage={setImg}
+            placeholder={<Avatar width={56} height={56} />}
+          />
         </ImagePickerContainer>
         <Container>
           <Controller
@@ -116,32 +105,15 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
   );
 };
 
-const ImagePickerContainer = styled.TouchableOpacity<{ hasImage: boolean }>`
-  background-color: ${({ theme }) =>
-    ifProp("hasImage", theme.colors.transparent, theme.colors.blue[6])};
-  width: 100px;
-  height: 100px;
-  border-radius: 50px;
-  position: relative;
-  justify-content: center;
-  overflow: ${ifProp("hasImage", "hidden", "visible")};
-  align-items: center;
-  margin: auto;
-  margin-bottom: 30px;
-`;
-
-const ImagePickerPlus = styled.View`
-  position: absolute;
-  right: 3px;
-  bottom: -1px;
-`;
-
 const StyledInput = styled(Input)`
   margin-bottom: 12px;
 `;
 
 const ProfileContainer = styled.View`
   margin-top: 46px;
-  /* flex: 1; */
-  /* justify-content: space-between; */
+`;
+
+const ImagePickerContainer = styled.View`
+  margin: auto;
+  margin-bottom: 30px;
 `;

@@ -44,6 +44,7 @@ export const Main = () => {
         name={MainRoute.Chats}
         component={Chats}
         options={({ navigation }) => ({
+          headerShown: false,
           tabBarButton: (props) => (
             <TabBarButton
               title="Chats"

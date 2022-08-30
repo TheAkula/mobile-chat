@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Text, View } from "react-native";
 import { Container, SearchInput } from "src/components";
 import { ContactsList } from "src/components/contacts";
+import { User } from "src/generated/graphql";
 import { useFetchMyContacts, useMyContactsStore } from "src/models";
 import { AppTheme } from "src/theme";
 import styled from "styled-components/native";
