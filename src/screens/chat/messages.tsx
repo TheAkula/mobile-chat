@@ -25,7 +25,7 @@ export const Messages = ({ route }: Props) => {
     fetchMessages({
       id: chatId,
       page: 0,
-      skip: messagesSkip,
+      // skip: messagesSkip,
     });
     // }
   }, []);

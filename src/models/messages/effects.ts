@@ -24,18 +24,13 @@ export const fetchMessagesFx = createEffect(
   async (variables: MessagesQueryVariables) => {
     const res = await apolloClient.query<MessagesQuery>({
       query: MessagesDocument,
+      fetchPolicy: "no-cache",
       variables,
     });
 
     return res;
   }
 );
-
-export const refetchMessagesFx = createEffect(() => {
-  return apolloClient.refetchQueries({
-    include: ["messages"],
-  });
-});
 
 export const fetchMoreMessagesFx = createEffect(
   (variables: MessagesQueryVariables) => {
@@ -67,8 +62,6 @@ export const messageSendedFx = createEffect(
       })
       .subscribe({
         next(data) {
-          console.log(data, "sub");
-
           if (data.data?.messageCreated) {
             addMessage(data.data.messageCreated);
           }
@@ -112,4 +105,4 @@ export const useMessageSendedSubscribe = () => useUnit(messageSendedFx);
 export const useMessageUpdatedSubscribe = () => useUnit(messageUpdatedFx);
 export const useReadMessages = () => useUnit(readMessagesFx);
 export const useFetchMoreMessages = () => useUnit(fetchMoreMessagesFx);
-export const useRefetchMessages = () => useUnit(refetchMessagesFx);
+// export const useRefetchMessages = () => useUnit(refetchMessagesFx);

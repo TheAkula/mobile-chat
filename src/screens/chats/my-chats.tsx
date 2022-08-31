@@ -27,9 +27,6 @@ export const MyChats = () => {
   return (
     <View>
       <Container>
-        <SearchContainer>
-          <SearchInput placeholderTextColor={AppTheme.colors.white[2]} />
-        </SearchContainer>
         <ChatsList chats={myChats} />
       </Container>
     </View>

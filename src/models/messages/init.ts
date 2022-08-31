@@ -5,7 +5,6 @@ import {
   fetchMessagesFx,
   fetchMoreMessagesFx,
   readMessagesFx,
-  refetchMessagesFx,
   sendMessageFx,
 } from "./effects";
 import { addMessage, pushMessage, updateMessage } from "./events";
@@ -22,11 +21,11 @@ $messages
   .on(fetchMessagesFx.doneData, (_, response) => {
     return response.data.messages.data;
   })
-  .on(sendMessageFx.doneData, (prev, response) => {
-    if (response.data?.createMessage) {
-      return [response.data?.createMessage, ...prev];
-    }
-  })
+  // .on(sendMessageFx.doneData, (prev, response) => {
+  //   if (response.data?.createMessage) {
+  //     return [response.data?.createMessage, ...prev];
+  //   }
+  // })
   .on(pushMessage, (prev, message) => [
     message,
     ...prev.map((mes) => {
@@ -56,9 +55,6 @@ $messages
   })
   .on(fetchMoreMessagesFx.doneData, (prev, response) => {
     return [...prev, ...response.data.messages.data];
-  })
-  .on(refetchMessagesFx.doneData, (_, response) => {
-    console.log(response);
   });
 
 $messagesPaginationPage
@@ -83,7 +79,8 @@ $fetchMessagesLoading.on(fetchMessagesFx.pending, (_, payload) => payload);
 
 $messagesSkip
   .on(sendMessageFx.done, (prev) => prev + 1)
-  .on(addMessage, (prev) => prev + 1);
+  .on(addMessage, (prev) => prev + 1)
+  .on(fetchMessagesFx.done, () => 0);
 
 sample({
   clock: addMessage,

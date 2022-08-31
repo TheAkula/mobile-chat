@@ -73,8 +73,9 @@ const transformMessages = (
       data: [],
     };
 
-    while (i < data.length - 1) {
+    while (i < data.length) {
       const messageDate = new Date(data[i].createdAt);
+
       const month = messageDate.getMonth();
       const day = messageDate.getDate();
 
@@ -82,6 +83,7 @@ const transformMessages = (
         section.data.push(data[i]);
         i++;
       } else {
+        i--;
         break;
       }
     }

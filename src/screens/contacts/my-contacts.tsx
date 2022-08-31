@@ -28,9 +28,6 @@ export const MyContacts = () => {
   return (
     <View>
       <Container>
-        <SearchContainer>
-          <SearchInput placeholderTextColor={AppTheme.colors.white[2]} />
-        </SearchContainer>
         <ContactsList contacts={myContacts} />
       </Container>
     </View>
