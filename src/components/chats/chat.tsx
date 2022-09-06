@@ -50,6 +50,13 @@ export const Chat = ({ item }: Props) => {
     });
   };
 
+  const sender =
+    user?.id === item.messages?.[0]?.author?.id
+      ? "You"
+      : !item.isFriendsChat
+      ? item.messages?.[0]?.author?.firstName
+      : "";
+
   return (
     <TouchableOpacity onPress={handlePress}>
       <ContactWrapper>
@@ -78,12 +85,8 @@ export const Chat = ({ item }: Props) => {
               </Name>
               {!!item.messages?.length && (
                 <Status>
-                  {user?.id === item.messages?.[0]?.author?.id
-                    ? "You"
-                    : !item.isFriendsChat
-                    ? item.messages?.[0]?.author?.firstName
-                    : ""}
-                  : {item.messages?.[0]?.content}
+                  {sender && sender + " : "}
+                  {item.messages?.[0]?.content}
                 </Status>
               )}
             </View>

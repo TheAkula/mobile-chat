@@ -3,24 +3,44 @@ import { useEffect } from "react";
 import { Image, Text, View } from "react-native";
 import { Avatar, Container, Btn } from "src/components";
 import {
+  setCurrentChat,
   useAddMyContact,
   useContactStore,
+  useCreatePersonalChat,
   useFetchContactInfo,
   useRemoveContact,
 } from "src/models";
 import { ContactsList } from "src/components/contacts";
-import { ContactsParamList, ContactsRoute } from "src/navigation/types";
+import {
+  ChatRoute,
+  ContactsParamList,
+  ContactsRoute,
+  MainParamList,
+  MainRoute,
+  RootParamList,
+  RootRoute,
+} from "src/navigation/types";
 import styled from "styled-components/native";
 import { User } from "src/generated/graphql";
+import { CompositeScreenProps } from "@react-navigation/native";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
-type Props = StackScreenProps<ContactsParamList, ContactsRoute.Profile>;
+type Props = CompositeScreenProps<
+  StackScreenProps<ContactsParamList, ContactsRoute.Profile>,
+  CompositeScreenProps<
+    BottomTabScreenProps<MainParamList, MainRoute.Contacts>,
+    StackScreenProps<RootParamList, RootRoute.Main>
+  >
+>;
 
-export const Profile = ({ route }: Props) => {
+export const Profile = ({ route, navigation }: Props) => {
   const { userId } = route.params;
+  const { push } = navigation;
   const { contact, contactLoading } = useContactStore();
   const fetchContactInfo = useFetchContactInfo();
   const addContact = useAddMyContact();
   const removeContact = useRemoveContact();
+  const createPersonalChat = useCreatePersonalChat();
 
   useEffect(() => {
     fetchContactInfo({
@@ -40,11 +60,29 @@ export const Profile = ({ route }: Props) => {
     });
   };
 
-  const sendPressed = () => {};
+  const sendPressed = async () => {
+    const res = await createPersonalChat({
+      id: userId,
+    });
+
+    setCurrentChat(res.data?.createPersonalChat.id || "");
+
+    push(RootRoute.Chat, {
+      screen: ChatRoute.Messages,
+      params: {
+        chatId: res.data?.createPersonalChat.id || "",
+        name:
+          res.data?.createPersonalChat.friend?.firstName +
+          " " +
+          res.data?.createPersonalChat.friend?.lastName,
+      },
+    });
+  };
 
   const isAdd = (item: Partial<User>) => {
     return !item.isFriend;
   };
+
   const isRemove = (item: Partial<User>) => {
     return !!item.isFriend;
   };
@@ -64,7 +102,7 @@ export const Profile = ({ route }: Props) => {
           {contact.avatar ? (
             <Image source={{ uri: contact.avatar, width: 100, height: 100 }} />
           ) : (
-            <Avatar />
+            <Avatar width={56} height={56} />
           )}
         </ImageContainer>
         <Info>

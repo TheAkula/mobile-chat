@@ -8,6 +8,9 @@ import {
   MyChatsQuery,
   CreateChatMutation,
   MyChatsQueryVariables,
+  CreatePersonalChatMutationVariables,
+  CreatePersonalChatMutation,
+  CreatePersonalChatDocument,
 } from "src/generated/graphql";
 
 export const fetchMyChatsFx = createEffect(
@@ -28,5 +31,15 @@ export const createChatFx = createEffect(
   }
 );
 
+export const createPersonalChatFx = createEffect(
+  (variables: CreatePersonalChatMutationVariables) => {
+    return apolloClient.mutate<CreatePersonalChatMutation>({
+      mutation: CreatePersonalChatDocument,
+      variables,
+    });
+  }
+);
+
 export const useFetchMyChats = () => useUnit(fetchMyChatsFx);
 export const useCreateChat = () => useUnit(createChatFx);
+export const useCreatePersonalChat = () => useUnit(createPersonalChatFx);

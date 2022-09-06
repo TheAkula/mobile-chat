@@ -1,4 +1,5 @@
 import { addMyContactFx, removeContactFx } from "../my-contacts";
+import { changeActivity } from "../users";
 import { fetchContactInfoFx } from "./effects";
 import { $contact, $contactError, $contactLoading } from "./state";
 
@@ -19,6 +20,14 @@ $contact
       return {
         ...prev,
         isFriend: true,
+      };
+    }
+  })
+  .on(changeActivity, (prev, payload) => {
+    if (prev.id === payload.id) {
+      return {
+        ...prev,
+        ...payload,
       };
     }
   });

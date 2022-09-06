@@ -1,0 +1,6 @@
+mutation activate {
+  activate {
+    isActive
+    lastSeen
+  }
+}

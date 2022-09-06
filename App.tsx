@@ -13,6 +13,9 @@ import styled from "styled-components/native";
 import { ApolloProvider } from "@apollo/client";
 import { apolloClient } from "src/api";
 import "src/models/init";
+import { useAppState } from "@react-native-community/hooks";
+import { useEffect } from "react";
+import { useActivate, useGoOut } from "src/models";
 
 const navTheme = {
   ...DefaultTheme,
@@ -23,6 +26,18 @@ const navTheme = {
 };
 
 export default function App() {
+  const appState = useAppState();
+  const activateUser = useActivate();
+  const goOut = useGoOut();
+
+  useEffect(() => {
+    if (appState === "active") {
+      activateUser();
+    } else {
+      goOut();
+    }
+  }, [appState]);
+
   const [fontsLoaded] = useFonts({
     Mulish_400Regular,
     Mulish_700Bold,

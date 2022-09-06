@@ -1,6 +1,7 @@
 import { $users, $usersError, $usersLoading } from "./state";
 import { addMyContactFx, removeContactFx } from "../my-contacts";
-import { fetchUsersFx } from "./effects";
+import { fetchUsersFx, userActivityChangedSubscribeFx } from "./effects";
+import { changeActivity } from "./events";
 
 $users
   .on(fetchUsersFx.doneData, (_, data) => data.data.users.data)
@@ -29,6 +30,20 @@ $users
       updatedUsers[index] = {
         ...prev[index],
         isFriend: false,
+      };
+
+      return updatedUsers;
+    }
+  })
+  .on(changeActivity, (prev, payload) => {
+    const userIndex = prev.findIndex((u) => u.id === payload.id);
+
+    if (userIndex !== -1) {
+      const updatedUsers = [...prev];
+
+      updatedUsers[userIndex] = {
+        ...updatedUsers[userIndex],
+        ...payload,
       };
 
       return updatedUsers;

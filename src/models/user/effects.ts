@@ -7,6 +7,10 @@ import {
   UpdateProfileMutationVariables,
   MyInfoDocument,
   MyInfoQuery,
+  ActivateMutation,
+  ActivateDocument,
+  GoOutMutation,
+  GoOutDocument,
 } from "src/generated/graphql";
 
 export const fetchUserInfoFX = createEffect(async () => {
@@ -24,5 +28,19 @@ export const updateProfileFx = createEffect(
   }
 );
 
+export const activateFx = createEffect(() => {
+  return apolloClient.mutate<ActivateMutation>({
+    mutation: ActivateDocument,
+  });
+});
+
+export const goOutFx = createEffect(() => {
+  return apolloClient.mutate<GoOutMutation>({
+    mutation: GoOutDocument,
+  });
+});
+
 export const useFetchUserInfo = () => useUnit(fetchUserInfoFX);
 export const useUpdateProfile = () => useUnit(updateProfileFx);
+export const useGoOut = () => useUnit(goOutFx);
+export const useActivate = () => useUnit(activateFx);

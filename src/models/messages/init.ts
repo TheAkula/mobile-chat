@@ -40,19 +40,19 @@ $messages
       };
     }),
   ])
-  .on(updateMessage, (prev, message) => {
-    const updatedMessages = [...prev];
-    const updatedMessageIndex = updatedMessages.findIndex(
-      (mes) => mes.id === message.id
-    );
+  // .on(updateMessage, (prev, message) => {
+  //   const updatedMessages = [...prev];
+  //   const updatedMessageIndex = updatedMessages.findIndex(
+  //     (mes) => mes.id === message.id
+  //   );
 
-    updatedMessages[updatedMessageIndex] = {
-      ...updatedMessages[updatedMessageIndex],
-      ...message,
-    };
+  //   updatedMessages[updatedMessageIndex] = {
+  //     ...updatedMessages[updatedMessageIndex],
+  //     ...message,
+  //   };
 
-    return updatedMessages;
-  })
+  //   return updatedMessages;
+  // })
   .on(fetchMoreMessagesFx.doneData, (prev, response) => {
     return [...prev, ...response.data.messages.data];
   });
@@ -88,7 +88,9 @@ sample({
     currentChat: $currentChat,
     user: $user,
   },
-  fn: (_, message) => message,
+  fn: (_, message) => {
+    return message;
+  },
   filter({ currentChat, user }, message) {
     return currentChat === message.chat?.id;
   },

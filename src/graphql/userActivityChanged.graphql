@@ -1,0 +1,7 @@
+subscription userActivityChanged {
+  userActivityChanged {
+    id
+    isActive
+    lastSeen
+  }
+}

@@ -4,7 +4,7 @@ import styled from "styled-components/native";
 import { Contact } from "./contact";
 
 interface Props {
-  contacts: Partial<Omit<User, "__typename">>[];
+  contacts: Partial<User>[];
   add?: (id: string) => void;
   remove?: (id: string) => void;
   send?: (id: string) => void;

@@ -1,0 +1,13 @@
+mutation createPersonalChat($id: String!) {
+  createPersonalChat(id: $id) {
+    id
+    friend {
+      avatar
+      firstName
+      lastName
+      id
+      isActive
+    }
+    isFriendsChat
+  }
+}

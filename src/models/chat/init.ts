@@ -9,11 +9,9 @@ $chat
   })
   .on(addToChatFx.doneData, (prev, response) => {
     if (response.data?.addToChat) {
-      const { __typename, ...user } = response.data.addToChat;
-
       return {
         ...prev,
-        users: [...(prev.users || []), user],
+        users: [...(prev.users || []), response.data.addToChat],
       };
     }
   })

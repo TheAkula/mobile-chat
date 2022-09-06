@@ -1,11 +1,13 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   DefaultSectionT,
   FlatList,
+  LayoutChangeEvent,
   ListRenderItem,
   SectionList,
   SectionListData,
   SectionListRenderItem,
+  View,
   ViewToken,
 } from "react-native";
 import { Message as MessageType } from "src/generated/graphql";
@@ -14,11 +16,12 @@ import { DeepPartial } from "src/types";
 import { getMonth } from "src/utils";
 import { Message } from "./message";
 import { MessagesListHeader } from "./messges-list-header";
-import { MessageToShow } from "../chats/types";
+import { ListSection, MessageToShow } from "./types";
 
 interface Props {
-  messages: DeepPartial<MessageType>[];
+  messages: ListSection[];
   endReached?: () => void;
+  isAllRead?: boolean;
 }
 
 interface ViewableHandlerProps {
@@ -26,82 +29,31 @@ interface ViewableHandlerProps {
   viewableItems: ViewToken[];
 }
 
-interface ListSection {
-  title: string;
-  data: MessageToShow[];
-}
-
 interface SectionHeaderRenderProps {
   section: SectionListData<MessageToShow, DefaultSectionT>;
 }
 
-const transformMessages = (
-  messages: DeepPartial<MessageType>[],
-  userId: string
-) => {
-  const data = messages.map((message) => {
-    const usersIds = message.usersSeen?.map((u) => u?.id) || [];
-    const isRead = usersIds.includes(userId);
-    const isMyRead =
-      !!usersIds.filter((id) => id !== userId).length &&
-      message.author?.id === userId;
+// const itemsHeights: number[] = [];
 
-    return {
-      ...message,
-      isRead,
-      isMyRead,
-    };
-  });
-
-  const result = [];
-  const dateNow = new Date();
-  const nowDay = dateNow.getDate();
-  const nowMonth = dateNow.getMonth();
-
-  for (let i = 0; i < data.length; i++) {
-    const date = new Date(data[i].createdAt);
-    const dateMonth = date.getMonth();
-    const dateDay = date.getDate();
-
-    const title =
-      nowDay === dateDay && nowMonth === dateMonth
-        ? "Today"
-        : [dateDay, getMonth(dateMonth)].join(" ");
-
-    const section: ListSection = {
-      title,
-      data: [],
-    };
-
-    while (i < data.length) {
-      const messageDate = new Date(data[i].createdAt);
-
-      const month = messageDate.getMonth();
-      const day = messageDate.getDate();
-
-      if (month === dateMonth && day === dateDay) {
-        section.data.push(data[i]);
-        i++;
-      } else {
-        i--;
-        break;
-      }
-    }
-
-    if (section.data.length) {
-      result.push(section);
-    }
-  }
-
-  return result;
-};
-
-export const MessagesList = ({ messages, endReached }: Props) => {
+export const MessagesList = ({ messages, endReached, isAllRead }: Props) => {
   const user = useUser();
+  const [itemsHeights, setItemsHeights] = useState<number[]>([]);
   const readMessages = useReadMessages();
+  const initialMessages = useRef(messages);
+  const listRef = useRef<SectionList>(null);
+
+  const itemOnLayout = (event: LayoutChangeEvent) => {
+    const height = event.nativeEvent.layout.height;
+
+    setItemsHeights((prevHeights) => [...prevHeights, height]);
+  };
 
   const renderItem: SectionListRenderItem<MessageToShow> = ({ item }) => {
-    return <Message {...item} isMine={item.author?.id === user?.id} />;
+    return (
+      <View onLayout={itemOnLayout}>
+        <Message {...item} isMine={item.author?.id === user?.id} />
+      </View>
+    );
   };
 
   const renderSectionHeader = ({ section }: SectionHeaderRenderProps) => {
@@ -111,22 +63,64 @@ export const MessagesList = ({ messages, endReached }: Props) => {
   const onViewableItemsChanged = useCallback(
     ({ changed }: ViewableHandlerProps) => {
       const notViewed = changed
-        .filter(({ item }) => !item.isRead)
+        .filter(({ item }) => !item.isRead && item.id)
         .map(({ item }) => item.id);
 
       if (notViewed.length) {
         readMessages({
-          messagesIds: notViewed,
+          messagesIds: Array.from(new Set(notViewed)),
         });
       }
     },
     []
   );
 
-  const data = transformMessages(messages, user?.id || "");
+  const section = initialMessages.current.find((section) => section.isNotRead);
+  const data = useMemo(() => {
+    if (section && !isAllRead) {
+      return messages
+        .slice(0, section.index)
+        .concat(section)
+        .concat(messages.slice(section.index));
+    }
+    return messages;
+  }, [isAllRead, messages]);
+
+  const onLayout = () => {
+    console.log("onLayout");
+
+    if (section) {
+      console.log("scroll");
+
+      console.log(section.notReadIndex);
+
+      listRef.current?.scrollToLocation({
+        sectionIndex: section?.index,
+        itemIndex: (section?.notReadIndex && section.notReadIndex + 1) || 0,
+        animated: false,
+      });
+    }
+  };
+
+  const getItemLayout = useCallback(
+    (
+      data: SectionListData<MessageToShow, DefaultSectionT>[] | null,
+      index: number
+    ) => {
+      const height = 60;
+
+      return {
+        length: height,
+        offset: height * index,
+        index,
+      };
+    },
+    [itemsHeights]
+  );
 
   return (
     <SectionList
+      // onLayout={onLayout}
       renderItem={renderItem}
       contentContainerStyle={{
         paddingRight: 16,
@@ -134,10 +128,14 @@ export const MessagesList = ({ messages, endReached }: Props) => {
         paddingLeft: 16,
       }}
       sections={data}
+      getItemLayout={getItemLayout}
       renderSectionFooter={renderSectionHeader}
       onViewableItemsChanged={onViewableItemsChanged}
+      // onContentSizeChange={onLayout}
+      initialScrollIndex={section?.notReadIndex}
       viewabilityConfig={{
-        viewAreaCoveragePercentThreshold: 50,
+        waitForInteraction: false,
+        viewAreaCoveragePercentThreshold: 100,
       }}
       onEndReached={endReached}
       inverted

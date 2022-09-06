@@ -1,20 +1,31 @@
+import { changeActivity } from "../users";
 import { addMyContactFx, fetchMyContactsFx, removeContactFx } from "./effects";
 import { $myContacts, $myContactsError, $myContactsLoading } from "./state";
 
-$myContacts.on(
-  fetchMyContactsFx.doneData,
-  (_, contacts) => contacts.data.myFriends
-);
+$myContacts
+  .on(fetchMyContactsFx.doneData, (_, contacts) => contacts.data.myFriends)
+  .on(addMyContactFx.doneData, (prevContacts, response) => {
+    if (response.data) {
+      return [...prevContacts, response.data.addFriend];
+    }
+  })
+  .on(removeContactFx.doneData, (prevContacts, response) =>
+    prevContacts.filter((contact) => contact.id !== response.data?.removeFriend)
+  )
+  .on(changeActivity, (prev, payload) => {
+    const userIndex = prev.findIndex((u) => u.id === payload.id);
 
-$myContacts.on(addMyContactFx.doneData, (prevContacts, response) => {
-  if (response.data) {
-    return [...prevContacts, response.data.addFriend];
-  }
-});
+    if (userIndex !== -1) {
+      const updatedUsers = [...prev];
 
-$myContacts.on(removeContactFx.doneData, (prevContacts, response) =>
-  prevContacts.filter((contact) => contact.id !== response.data?.removeFriend)
-);
+      updatedUsers[userIndex] = {
+        ...updatedUsers[userIndex],
+        ...payload,
+      };
+
+      return updatedUsers;
+    }
+  });
 
 $myContactsLoading
   .on(fetchMyContactsFx.pending, (_, payload) => payload)

@@ -1,6 +1,6 @@
 import { forward, sample } from "effector";
 import { addMessage, readMessagesFx, sendMessageFx } from "../messages";
-import { createChatFx, fetchMyChatsFx } from "./effects";
+import { createChatFx, createPersonalChatFx, fetchMyChatsFx } from "./effects";
 import { receiveMessage, setCurrentChat } from "./events";
 import { $chats, $chatsError, $chatsLoading, $currentChat } from "./state";
 
@@ -62,6 +62,15 @@ $chats
   .on(createChatFx.doneData, (prev, response) => {
     if (response.data?.createChat) {
       return [...prev, response.data?.createChat];
+    }
+  })
+  .on(createPersonalChatFx.doneData, (prev, response) => {
+    const exChat = prev.find(
+      (chat) => chat.id === response.data?.createPersonalChat.id
+    );
+
+    if (!exChat && response.data?.createPersonalChat) {
+      return [...prev, response.data?.createPersonalChat];
     }
   });
 

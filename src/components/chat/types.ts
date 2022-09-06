@@ -5,3 +5,11 @@ export type MessageToShow = DeepPartial<Message> & {
   isRead: boolean;
   isMyRead: boolean;
 };
+
+export interface ListSection {
+  title: string;
+  data: MessageToShow[];
+  isNotRead?: boolean;
+  index: number;
+  notReadIndex?: number;
+}

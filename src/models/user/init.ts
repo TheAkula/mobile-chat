@@ -1,7 +1,7 @@
-import { sample } from "effector";
+import { forward, sample } from "effector";
 import { messageSendedFx } from "../messages";
-import { $usersError } from "../users";
-import { updateProfileFx, fetchUserInfoFX } from "./effects";
+import { $usersError, userActivityChangedSubscribeFx } from "../users";
+import { updateProfileFx, fetchUserInfoFX, activateFx } from "./effects";
 import { $user, $userLoading } from "./state";
 
 $user
@@ -46,4 +46,9 @@ sample({
   clock: fetchUserInfoFX.doneData,
   fn: (response) => ({ userId: response.data.myUserInfo.id }),
   target: messageSendedFx,
+});
+
+forward({
+  from: fetchUserInfoFX.doneData,
+  to: userActivityChangedSubscribeFx,
 });

@@ -5,7 +5,10 @@ import {
   UsersQuery,
   UsersDocument,
   UsersQueryVariables,
+  UserActivityChangedSubscription,
+  UserActivityChangedDocument,
 } from "src/generated/graphql";
+import { changeActivity } from "./events";
 
 export const fetchUsersFx = createEffect((variables?: UsersQueryVariables) => {
   return apolloClient.query<UsersQuery>({
@@ -26,5 +29,21 @@ export const fetchMoreUsersFx = createEffect(
   }
 );
 
+export const userActivityChangedSubscribeFx = createEffect(() => {
+  return apolloClient
+    .subscribe<UserActivityChangedSubscription>({
+      query: UserActivityChangedDocument,
+    })
+    .subscribe({
+      next(value) {
+        if (value.data) {
+          changeActivity(value.data.userActivityChanged);
+        }
+      },
+    });
+});
+
 export const useFetchUsers = () => useUnit(fetchUsersFx);
 export const useFetchMoreUsers = () => useUnit(fetchMoreUsersFx);
+export const useUserActivityChangedSubscribe = () =>
+  useUnit(userActivityChangedSubscribeFx);
