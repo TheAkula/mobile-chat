@@ -1,15 +1,6 @@
 import { StackScreenProps } from "@react-navigation/stack";
-import { useEffect } from "react";
 import { Image, Text, View } from "react-native";
 import { Avatar, Container, Btn } from "src/components";
-import {
-  setCurrentChat,
-  useAddMyContact,
-  useContactStore,
-  useCreatePersonalChat,
-  useFetchContactInfo,
-  useRemoveContact,
-} from "src/models";
 import { ContactsList } from "src/components/contacts";
 import {
   ChatRoute,
@@ -21,9 +12,16 @@ import {
   RootRoute,
 } from "src/navigation/types";
 import styled from "styled-components/native";
-import { User } from "src/generated/graphql";
+import {
+  useAddContactMutation,
+  useCreatePersonalChatMutation,
+  User,
+  useRemoveContactMutation,
+  useUserInfoQuery,
+} from "src/generated/graphql";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { useCurrentChatContext } from "src/context";
 
 type Props = CompositeScreenProps<
   StackScreenProps<ContactsParamList, ContactsRoute.Profile>,
@@ -36,33 +34,35 @@ type Props = CompositeScreenProps<
 export const Profile = ({ route, navigation }: Props) => {
   const { userId } = route.params;
   const { push } = navigation;
-  const { contact, contactLoading } = useContactStore();
-  const fetchContactInfo = useFetchContactInfo();
-  const addContact = useAddMyContact();
-  const removeContact = useRemoveContact();
-  const createPersonalChat = useCreatePersonalChat();
-
-  useEffect(() => {
-    fetchContactInfo({
-      id: userId,
-    });
-  }, []);
+  const { data: contactData, loading: contactLoading } = useUserInfoQuery({
+    variables: { id: userId },
+  });
+  const { setCurrentChat } = useCurrentChatContext();
+  const [addContact] = useAddContactMutation();
+  const [removeContact] = useRemoveContactMutation();
+  const [createPersonalChat] = useCreatePersonalChatMutation();
 
   const addPressed = () => {
     addContact({
-      friendId: userId,
+      variables: {
+        friendId: userId,
+      },
     });
   };
 
   const removePressed = () => {
     removeContact({
-      id: userId,
+      variables: {
+        id: userId,
+      },
     });
   };
 
   const sendPressed = async () => {
     const res = await createPersonalChat({
-      id: userId,
+      variables: {
+        id: userId,
+      },
     });
 
     setCurrentChat(res.data?.createPersonalChat.id || "");
@@ -87,7 +87,7 @@ export const Profile = ({ route, navigation }: Props) => {
     return !!item.isFriend;
   };
 
-  if (!contact || contactLoading) {
+  if (!contactData || contactLoading) {
     return (
       <View>
         <Text>Loading...</Text>
@@ -99,17 +99,21 @@ export const Profile = ({ route, navigation }: Props) => {
     <Container>
       <InfoContainer>
         <ImageContainer>
-          {contact.avatar ? (
-            <Image source={{ uri: contact.avatar, width: 100, height: 100 }} />
+          {contactData.user.avatar ? (
+            <Image
+              source={{ uri: contactData.user.avatar, width: 100, height: 100 }}
+            />
           ) : (
             <Avatar width={56} height={56} />
           )}
         </ImageContainer>
         <Info>
-          <Name>{`${contact.firstName} ${contact.lastName}`}</Name>
+          <Name>{`${contactData.user.firstName} ${contactData.user.lastName}`}</Name>
 
           <StyledText>
-            {contact.isActive ? "Online" : `Last seen ${contact.lastSeen}`}
+            {contactData.user.isActive
+              ? "Online"
+              : `Last seen ${contactData.user.lastSeen}`}
           </StyledText>
         </Info>
       </InfoContainer>
@@ -120,7 +124,7 @@ export const Profile = ({ route, navigation }: Props) => {
           </Btn>
         </StyledBtnContainer>
         <BtnContainer>
-          {contact.isFriend ? (
+          {contactData.user.isFriend ? (
             <Btn pressed={removePressed}>
               <StyledText>Remove</StyledText>
             </Btn>
@@ -133,7 +137,7 @@ export const Profile = ({ route, navigation }: Props) => {
       </BtnsContainer>
       <Header>Friends</Header>
       <ContactsList
-        contacts={contact.friends || []}
+        contacts={contactData.user.friends || []}
         isAdd={isAdd}
         isRemove={isRemove}
         add={addPressed}

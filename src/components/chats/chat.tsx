@@ -1,8 +1,7 @@
 import { TouchableOpacity, View } from "react-native";
-import { Chat as ChatType } from "src/generated/graphql";
+import { Chat as ChatType, useMyInfoQuery } from "src/generated/graphql";
 import styled from "styled-components/native";
 import { DeepPartial } from "src/types";
-import { useSetCurrentChat, useUser } from "src/models";
 import {
   CompositeNavigationProp,
   useNavigation,
@@ -18,6 +17,7 @@ import {
   RootRoute,
 } from "src/navigation/types";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { useCurrentChatContext } from "src/context";
 
 interface Props {
   item: DeepPartial<ChatType>;
@@ -32,9 +32,9 @@ type NavProp = CompositeNavigationProp<
 >;
 
 export const Chat = ({ item }: Props) => {
-  const user = useUser();
+  const { data: userData } = useMyInfoQuery();
   const { push } = useNavigation<NavProp>();
-  const setCurrentChat = useSetCurrentChat();
+  const { setCurrentChat } = useCurrentChatContext();
 
   const handlePress = () => {
     setCurrentChat(item.id || "");
@@ -51,7 +51,7 @@ export const Chat = ({ item }: Props) => {
   };
 
   const sender =
-    user?.id === item.messages?.[0]?.author?.id
+    userData?.myUserInfo?.id === item.messages?.[0]?.author?.id
       ? "You"
       : !item.isFriendsChat
       ? item.messages?.[0]?.author?.firstName

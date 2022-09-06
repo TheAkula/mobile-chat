@@ -1,7 +1,8 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { Header } from "src/components";
 import { InviteButton } from "src/components/chat";
-import { useMyChatsStore } from "src/models";
+import { useCurrentChatContext } from "src/context";
+import { useMyChatsQuery } from "src/generated/graphql";
 import { ChatParamsList, ChatRoute } from "src/navigation/types";
 import { Invite } from "./invite";
 import { Messages } from "./messages";
@@ -9,9 +10,10 @@ import { Messages } from "./messages";
 const ChatStack = createStackNavigator<ChatParamsList>();
 
 export const Chat = () => {
-  const { currentChat, myChats } = useMyChatsStore();
+  const { data: myChatsData } = useMyChatsQuery();
+  const { currentChat } = useCurrentChatContext();
 
-  const chat = myChats.find((c) => c.id === currentChat);
+  const chat = myChatsData?.myChats.find((c) => c.id === currentChat);
 
   return (
     <ChatStack.Navigator screenOptions={{ headerShown: false }}>

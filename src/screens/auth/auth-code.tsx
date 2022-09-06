@@ -17,7 +17,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
 import { Keyboard } from "react-native";
-import { useConfirmSignupWith2fa } from "src/models";
+import { useConfirmSignUpWith2faMutation } from "src/generated/graphql";
 
 type Props = StackScreenProps<AuthParamList, AuthRoute.AuthCode>;
 
@@ -27,14 +27,14 @@ export const AuthCode = ({ navigation, route: { params } }: Props) => {
   const { email, counter } = params;
   const [isFull, setIsFull] = useState(false);
   const inputRef = useRef<TextInput>();
-  const confirmSignupWith2fa = useConfirmSignupWith2fa();
+  const [confirmSignupWith2fa] = useConfirmSignUpWith2faMutation();
 
   useEffect(() => {
     const nums = code.map((c) => (c ? c : "")).join("");
     if (nums.length === 6) {
       setIsFull(true);
       Keyboard.dismiss();
-      confirmSignupWith2fa({ counter, code: +nums }).then(() => {
+      confirmSignupWith2fa({ variables: { counter, code: +nums } }).then(() => {
         navigate(AuthRoute.AuthProfile);
       });
     }

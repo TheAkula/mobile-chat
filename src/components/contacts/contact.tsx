@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from "react-native";
-import { User } from "src/generated/graphql";
+import { useMyInfoQuery, User } from "src/generated/graphql";
 import styled from "styled-components/native";
 import { Plus, Btn } from "src/components";
 import {
@@ -16,7 +16,6 @@ import {
   RootParamList,
   RootRoute,
 } from "src/navigation/types";
-import { useUser } from "src/models";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 interface Props {
@@ -38,7 +37,8 @@ type NavProp = CompositeNavigationProp<
 
 export const Contact = ({ item, add, remove, isAdd, isRemove }: Props) => {
   const { push } = useNavigation<NavProp>();
-  const user = useUser();
+  // const user = useUser();
+  const { data } = useMyInfoQuery();
 
   const addPressed = () => {
     add && item.id && add(item.id);
@@ -49,7 +49,7 @@ export const Contact = ({ item, add, remove, isAdd, isRemove }: Props) => {
   };
 
   const userName = [item.firstName, item.lastName].join(" ");
-  const isMe = item.id === user?.id;
+  const isMe = item.id === data?.myUserInfo?.id;
 
   const handlePress = () => {
     if (item.id) {

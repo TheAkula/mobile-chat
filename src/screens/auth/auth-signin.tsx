@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { Container, Input, Button } from "src/components";
-import { useSignin } from "src/models";
+import { useSigninMutation } from "src/generated/graphql";
 import { AuthSignIn as AuthSignInForm } from "src/types";
 import { authSignin } from "src/utils";
 import styled from "styled-components/native";
@@ -23,12 +23,14 @@ export const AuthSignIn = () => {
     mode: "all",
     resolver: yupResolver(authSignin),
   });
-  const signin = useSignin();
+  const [signin] = useSigninMutation();
 
   const onSubmit = (data: AuthSignInForm) => {
     signin({
-      email: data.email,
-      password: data.password,
+      variables: {
+        email: data.email,
+        password: data.password,
+      },
     });
   };
 

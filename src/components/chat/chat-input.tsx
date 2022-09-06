@@ -3,7 +3,7 @@ import styled from "styled-components/native";
 import { Plus, Input, Send } from "src/components";
 import { useState } from "react";
 import { AppTheme } from "src/theme";
-import { useSendMessage } from "src/models";
+import { useSendMessageMutation } from "src/generated/graphql";
 
 interface Props {
   chatId: string;
@@ -11,14 +11,16 @@ interface Props {
 
 export const ChatInput = ({ chatId }: Props) => {
   const [message, setMessage] = useState("");
-  const sendMessage = useSendMessage();
+  const [sendMessage, { loading }] = useSendMessageMutation();
 
   const handleSend = async () => {
-    if (message) {
+    if (message && !loading) {
       try {
         await sendMessage({
-          content: message,
-          chatId,
+          variables: {
+            content: message,
+            chatId,
+          },
         });
       } finally {
         setMessage("");
@@ -41,7 +43,7 @@ export const ChatInput = ({ chatId }: Props) => {
       />
       <TouchableOpacity onPress={handleSend}>
         <SendContainer>
-          <Send />
+          <Send color={loading ? AppTheme.colors.blue[1] : undefined} />
         </SendContainer>
       </TouchableOpacity>
     </InputContainer>

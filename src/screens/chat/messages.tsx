@@ -1,16 +1,17 @@
+import { NetworkStatus } from "@apollo/client";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useEffect } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { MessagesList, ChatInput, ListSection } from "src/components/chat";
-import { MessageToShow } from "src/components/chat";
-import { Message } from "src/generated/graphql";
 import {
-  useFetchMessages,
-  useFetchMessagesLoading,
-  useFetchMoreMessages,
-  useMessagesStore,
-  useUser,
-} from "src/models";
+  Message,
+  MessageSendedDocument,
+  MessageSendedSubscription,
+  MessageSendedSubscriptionVariables,
+  useMessagesQuery,
+  useMyInfoQuery,
+} from "src/generated/graphql";
+
 import { ChatParamsList, ChatRoute } from "src/navigation/types";
 import { DeepPartial } from "src/types";
 import { getMonth } from "src/utils";
@@ -22,19 +23,24 @@ const transformMessages = (
   messages: DeepPartial<Message>[],
   userId: string
 ) => {
-  const data = messages.map((message) => {
-    const usersIds = message.usersSeen?.map((u) => u?.id) || [];
-    const isRead = usersIds.includes(userId);
-    const isMyRead =
-      !!usersIds.filter((id) => id !== userId).length &&
-      message.author?.id === userId;
+  const data = messages
+    .map((message) => {
+      const usersIds = message.usersSeen?.map((u) => u?.id) || [];
+      const isRead = usersIds.includes(userId);
+      const isMyRead =
+        !!usersIds.filter((id) => id !== userId).length &&
+        message.author?.id === userId;
 
-    return {
-      ...message,
-      isRead,
-      isMyRead,
-    };
-  });
+      return {
+        ...message,
+        isRead,
+        isMyRead,
+      };
+    })
+    .sort((a, b) =>
+      new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime() ? -1 : 1
+    );
+
   const result: ListSection[] = [];
   const dateNow = new Date();
   const nowDay = dateNow.getDate();
@@ -90,6 +96,8 @@ const transformMessages = (
     }
 
     if (sectionData.length) {
+      console.log(sectionData.length);
+
       result.push({
         title,
         data: sectionData,
@@ -103,41 +111,74 @@ const transformMessages = (
 
 export const Messages = ({ route }: Props) => {
   const { chatId } = route.params;
-  const user = useUser();
-  const { messages, messagesNextPage, messagesSkip } = useMessagesStore();
-  const loading = useFetchMessagesLoading();
-  const fetchMessages = useFetchMessages();
-  const fetchMoreMessages = useFetchMoreMessages();
+  const { data: userData } = useMyInfoQuery();
+  const {
+    data: messagesData,
+    fetchMore,
+    networkStatus,
+    subscribeToMore,
+  } = useMessagesQuery({
+    variables: {
+      id: chatId,
+    },
+    notifyOnNetworkStatusChange: true,
+  });
 
   useEffect(() => {
-    console.log("qwe");
-    fetchMessages({
-      id: chatId,
-      page: 0,
-    });
+    console.log("subscribe");
+    if (userData?.myUserInfo.id) {
+      subscribeToMore<
+        MessageSendedSubscription,
+        MessageSendedSubscriptionVariables
+      >({
+        document: MessageSendedDocument,
+        variables: {
+          userId: userData?.myUserInfo.id,
+        },
+        updateQuery(prev, { subscriptionData }) {
+          if (!subscriptionData.data.messageCreated) {
+            return prev;
+          }
+
+          return {
+            messages: {
+              ...prev.messages,
+              data: [subscriptionData.data.messageCreated],
+            },
+            myChats: [{ id: 1 }],
+          };
+        },
+      });
+    }
   }, []);
 
   const onEndReached = () => {
-    console.log("end");
-
-    if (messagesNextPage) {
-      console.log("fetch more");
-      fetchMoreMessages({
-        id: chatId,
-        page: messagesNextPage,
-        skip: messagesSkip,
+    if (
+      messagesData?.messages.nextPage &&
+      networkStatus !== NetworkStatus.fetchMore
+    ) {
+      fetchMore({
+        variables: {
+          id: chatId,
+          skip: messagesData.messages.data.length,
+        },
       });
     }
   };
 
-  const transformedMessages = transformMessages(messages, user?.id || "");
+  const transformedMessages = messagesData?.messages.data
+    ? transformMessages(
+        messagesData.messages.data,
+        userData?.myUserInfo?.id || ""
+      )
+    : [];
 
   const isAllRead = !!transformedMessages.find((message) => message.isNotRead);
 
   return (
     <Container>
       <View style={{ flex: 1 }}>
-        {!loading && (
+        {networkStatus !== NetworkStatus.loading && (
           <MessagesList
             messages={transformedMessages}
             endReached={onEndReached}

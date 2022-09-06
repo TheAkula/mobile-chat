@@ -1,19 +1,14 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
   DefaultSectionT,
-  FlatList,
   LayoutChangeEvent,
-  ListRenderItem,
   SectionList,
   SectionListData,
   SectionListRenderItem,
   View,
   ViewToken,
 } from "react-native";
-import { Message as MessageType } from "src/generated/graphql";
-import { useReadMessages, useUser } from "src/models";
-import { DeepPartial } from "src/types";
-import { getMonth } from "src/utils";
+import { useMyInfoQuery, useReadMessagesMutation } from "src/generated/graphql";
 import { Message } from "./message";
 import { MessagesListHeader } from "./messges-list-header";
 import { ListSection, MessageToShow } from "./types";
@@ -33,12 +28,10 @@ interface SectionHeaderRenderProps {
   section: SectionListData<MessageToShow, DefaultSectionT>;
 }
 
-// const itemsHeights: number[] = [];
-
 export const MessagesList = ({ messages, endReached, isAllRead }: Props) => {
-  const user = useUser();
+  const { data: userData } = useMyInfoQuery();
+  const [readMessages] = useReadMessagesMutation();
   const [itemsHeights, setItemsHeights] = useState<number[]>([]);
-  const readMessages = useReadMessages();
   const initialMessages = useRef(messages);
   const listRef = useRef<SectionList>(null);
 
@@ -50,8 +43,11 @@ export const MessagesList = ({ messages, endReached, isAllRead }: Props) => {
 
   const renderItem: SectionListRenderItem<MessageToShow> = ({ item }) => {
     return (
-      <View onLayout={itemOnLayout}>
-        <Message {...item} isMine={item.author?.id === user?.id} />
+      <View>
+        <Message
+          {...item}
+          isMine={item.author?.id === userData?.myUserInfo?.id}
+        />
       </View>
     );
   };
@@ -68,7 +64,9 @@ export const MessagesList = ({ messages, endReached, isAllRead }: Props) => {
 
       if (notViewed.length) {
         readMessages({
-          messagesIds: Array.from(new Set(notViewed)),
+          variables: {
+            messagesIds: Array.from(new Set(notViewed)),
+          },
         });
       }
     },
@@ -102,21 +100,21 @@ export const MessagesList = ({ messages, endReached, isAllRead }: Props) => {
     }
   };
 
-  const getItemLayout = useCallback(
-    (
-      data: SectionListData<MessageToShow, DefaultSectionT>[] | null,
-      index: number
-    ) => {
-      const height = 60;
+  // const getItemLayout = useCallback(
+  //   (
+  //     data: SectionListData<MessageToShow, DefaultSectionT>[] | null,
+  //     index: number
+  //   ) => {
+  //     const height = 60;
 
-      return {
-        length: height,
-        offset: height * index,
-        index,
-      };
-    },
-    [itemsHeights]
-  );
+  //     return {
+  //       length: height,
+  //       offset: height * index,
+  //       index,
+  //     };
+  //   },
+  //   [itemsHeights]
+  // );
 
   return (
     <SectionList
@@ -128,7 +126,7 @@ export const MessagesList = ({ messages, endReached, isAllRead }: Props) => {
         paddingLeft: 16,
       }}
       sections={data}
-      getItemLayout={getItemLayout}
+      // getItemLayout={getItemLayout}
       renderSectionFooter={renderSectionHeader}
       onViewableItemsChanged={onViewableItemsChanged}
       // onContentSizeChange={onLayout}

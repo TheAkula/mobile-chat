@@ -4,36 +4,38 @@ import { Chevron, Header } from "src/components";
 import { Auth, Chat } from "src/screens";
 import { Main } from "./main";
 import { AppTheme } from "src/theme";
-import { useFetchUserInfo, useUserStore } from "src/models";
 import { RootParamList, RootRoute } from "./types";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AsyncStorageKey } from "src/constants";
 import styled from "styled-components/native";
-import { AuthStatus } from "src/generated/graphql";
+import {
+  AuthStatus,
+  useActivateMutation,
+  useGoOutMutation,
+  useMessageSendedSubscription,
+  useMyInfoQuery,
+  useUserInfoLazyQuery,
+} from "src/generated/graphql";
+import { useAppState } from "@react-native-community/hooks";
 
 const RootStack = createStackNavigator<RootParamList>();
 
 export const Routes = () => {
-  const { user } = useUserStore();
-  const fetchUserInfo = useFetchUserInfo();
-  const [isFetched, setIsFetched] = useState(false);
+  const appState = useAppState();
+  const [activateUser] = useActivateMutation();
+  const [goOut] = useGoOutMutation();
+  const { data: userData, loading } = useMyInfoQuery();
 
   useEffect(() => {
-    AsyncStorage.getItem(AsyncStorageKey.USER_TOKEN).then((token) => {
-      if (token) {
-        fetchUserInfo()
-          .catch((err) => {})
-          .finally(() => {
-            setIsFetched(true);
-          });
-      } else {
-        setIsFetched(true);
-      }
-    });
-  }, []);
+    if (appState === "active") {
+      activateUser();
+    } else {
+      goOut();
+    }
+  }, [appState]);
 
-  if (!isFetched) {
+  if (loading || !userData) {
     return (
       <View>
         <Text>Loading...</Text>
@@ -59,13 +61,13 @@ export const Routes = () => {
           headerShadowVisible: false,
         })}
       >
-        {user?.authStatus === AuthStatus.HaveAccount && (
+        {userData?.myUserInfo?.authStatus === AuthStatus.HaveAccount && (
           <>
             <RootStack.Screen name={RootRoute.Main} component={Main} />
             <RootStack.Screen name={RootRoute.Chat} component={Chat} />
           </>
         )}
-        {user?.authStatus !== AuthStatus.HaveAccount && (
+        {userData?.myUserInfo?.authStatus !== AuthStatus.HaveAccount && (
           <RootStack.Screen
             name={RootRoute.Auth}
             component={Auth}

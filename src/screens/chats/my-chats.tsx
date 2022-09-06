@@ -1,22 +1,13 @@
-import { useEffect } from "react";
 import { Text, View } from "react-native";
-import { Container, SearchInput } from "src/components";
+import { Container } from "src/components";
 import { ChatsList } from "src/components/chats";
-import { useFetchMyChats, useMyChatsStore } from "src/models";
-import { AppTheme } from "src/theme";
+import { useMyChatsQuery } from "src/generated/graphql";
 import styled from "styled-components/native";
 
 export const MyChats = () => {
-  const { myChats, myChatsLoading } = useMyChatsStore();
-  const fetchMyChats = useFetchMyChats();
+  const { data: myChatsData, loading: myChatsLoading } = useMyChatsQuery();
 
-  useEffect(() => {
-    if (!myChats || !myChats.length) {
-      fetchMyChats();
-    }
-  }, []);
-
-  if (!myChats || myChatsLoading) {
+  if (!myChatsData?.myChats || myChatsLoading) {
     return (
       <View>
         <Text>Loading...</Text>
@@ -27,7 +18,7 @@ export const MyChats = () => {
   return (
     <View>
       <Container>
-        <ChatsList chats={myChats} />
+        <ChatsList chats={myChatsData.myChats} />
       </Container>
     </View>
   );

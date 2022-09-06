@@ -1,23 +1,13 @@
-import { useEffect } from "react";
 import { Text, View } from "react-native";
-import { Container, SearchInput } from "src/components";
+import { Container } from "src/components";
 import { ContactsList } from "src/components/contacts";
-import { User } from "src/generated/graphql";
-import { useFetchMyContacts, useMyContactsStore } from "src/models";
-import { AppTheme } from "src/theme";
-import styled from "styled-components/native";
+import { useContactsQuery } from "src/generated/graphql";
 
 export const MyContacts = () => {
-  const { myContacts, myContactsLoading } = useMyContactsStore();
-  const fetchMyContacts = useFetchMyContacts();
+  const { data: myContactsData, loading: myContactsLoading } =
+    useContactsQuery();
 
-  useEffect(() => {
-    if (!myContacts || !myContacts.length) {
-      fetchMyContacts();
-    }
-  }, []);
-
-  if (!myContacts || myContactsLoading) {
+  if (!myContactsData?.myFriends || myContactsLoading) {
     return (
       <View>
         <Text>Loading...</Text>
@@ -28,12 +18,8 @@ export const MyContacts = () => {
   return (
     <View>
       <Container>
-        <ContactsList contacts={myContacts} />
+        <ContactsList contacts={myContactsData.myFriends} />
       </Container>
     </View>
   );
 };
-
-const SearchContainer = styled.View`
-  margin-top: 16px;
-`;

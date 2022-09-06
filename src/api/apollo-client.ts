@@ -98,6 +98,11 @@ export const apolloClient = new ApolloClient({
               };
             },
           },
+          myChats: {
+            merge(_, incoming) {
+              return incoming;
+            },
+          },
         },
       },
     },

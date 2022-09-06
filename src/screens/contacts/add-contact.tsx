@@ -3,49 +3,104 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { Container, SearchInput } from "src/components";
 import { ContactsList } from "src/components/contacts";
-import { User } from "src/generated/graphql";
 import {
-  useAddMyContact,
-  useFetchMoreUsers,
-  useFetchUsers,
-  useRemoveContact,
-  useUsersStore,
-} from "src/models";
+  ContactsDocument,
+  ContactsQuery,
+  useAddContactMutation,
+  User,
+  useRemoveContactMutation,
+  UsersDocument,
+  UsersQuery,
+  useUsersLazyQuery,
+  useUsersQuery,
+} from "src/generated/graphql";
+
 import { AppTheme } from "src/theme";
 import styled from "styled-components/native";
 
 export const AddContact = () => {
-  const { users, usersNextPage } = useUsersStore();
-  const fetchUsers = useFetchUsers();
-  const addContact = useAddMyContact();
-  const removeContact = useRemoveContact();
-  const fetchMoreUsers = useFetchMoreUsers();
+  const [fetchUsers, { data: usersData, fetchMore }] = useUsersLazyQuery();
+  const [addContact] = useAddContactMutation({
+    update: (cache, { data }) => {
+      const existsingContacts = cache.readQuery<ContactsQuery>({
+        query: ContactsDocument,
+      });
+
+      if (data?.addFriend) {
+        cache.writeQuery<ContactsQuery>({
+          query: ContactsDocument,
+          data: {
+            myFriends: [
+              ...(existsingContacts?.myFriends || []),
+              data?.addFriend,
+            ],
+          },
+        });
+
+        const users = cache.readQuery<UsersQuery>({
+          query: UsersDocument,
+        });
+
+        const updatedUsers = {
+          ...users,
+          users: {
+            ...users?.users,
+            data: [...(users?.users.data || [])],
+          },
+        };
+
+        const updatedUserIndex = users?.users.data.findIndex(
+          (u) => u.id === data.addFriend.id
+        );
+
+        console.log(updatedUserIndex, users);
+
+        console.log("some");
+
+        updatedUsers.users.data[updatedUserIndex] = {
+          ...updatedUsers.users.data[updatedUserIndex],
+          isFriend: true,
+        };
+        console.log(updatedUsers.users);
+
+        cache.writeQuery<UsersQuery>({
+          query: UsersDocument,
+          data: updatedUsers,
+        });
+      }
+    },
+  });
+  const [removeContact] = useRemoveContactMutation();
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
-    if (!users || !users.length) {
-      fetchUsers();
-    }
+    fetchUsers();
   }, []);
 
   const addedContact = (id: string) => {
     addContact({
-      friendId: id,
+      variables: {
+        friendId: id,
+      },
     });
   };
 
   const removedContact = (id: string) => {
     removeContact({
-      id,
+      variables: {
+        id,
+      },
     });
   };
 
   const onEndReached = () => {
-    if (usersNextPage) {
-      fetchMoreUsers({
-        page: usersNextPage,
-        filter: {
-          name: searchValue,
+    if (usersData?.users.nextPage) {
+      fetchMore({
+        variables: {
+          page: usersData?.users.nextPage,
+          filter: {
+            name: searchValue,
+          },
         },
       });
     }
@@ -56,9 +111,11 @@ export const AddContact = () => {
 
     debounce(() => {
       fetchUsers({
-        page: 0,
-        filter: {
-          name: value,
+        variables: {
+          page: 0,
+          filter: {
+            name: value,
+          },
         },
       });
     }, 1000)();
@@ -82,7 +139,7 @@ export const AddContact = () => {
           />
         </SearchContainer>
         <ContactsList
-          contacts={users}
+          contacts={usersData?.users.data || []}
           add={addedContact}
           isAdd={isAdd}
           isRemove={isRemove}

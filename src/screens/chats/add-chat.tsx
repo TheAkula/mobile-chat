@@ -4,7 +4,7 @@ import { ImageInfo } from "expo-image-picker";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Chats, Container, ImagePicker, Input } from "src/components";
-import { useCreateChat } from "src/models";
+import { useCreateChatMutation } from "src/generated/graphql";
 import { ChatsParamsList, ChatsRoute } from "src/navigation/types";
 import { IAddChat } from "src/types";
 import { chatsAdd } from "src/utils";
@@ -25,13 +25,15 @@ export const AddChat = ({ navigation }: Props) => {
   });
 
   const [image, setImage] = useState<ImageInfo | null>(null);
-  const createChat = useCreateChat();
+  const [createChat] = useCreateChatMutation();
 
   const onSubmited = async (data: IAddChat) => {
     await createChat({
-      name: data.name,
-      image: image?.base64,
-      imageExt: image?.uri.slice(image.uri.lastIndexOf(".") + 1),
+      variables: {
+        name: data.name,
+        image: image?.base64,
+        imageExt: image?.uri.slice(image.uri.lastIndexOf(".") + 1),
+      },
     });
     navigate(ChatsRoute.MyChats);
   };

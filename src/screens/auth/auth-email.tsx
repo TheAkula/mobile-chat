@@ -13,12 +13,12 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { authPhone } from "src/utils";
 import { AuthEmailForm } from "src/types";
-import { useSignupWith2fa } from "src/models";
+import { useSignUpWith2faMutation } from "src/generated/graphql";
 
 type Props = StackScreenProps<AuthParamList, AuthRoute.AuthPhone>;
 
 export const AuthEmail = ({ navigation }: Props) => {
-  const signupWith2fa = useSignupWith2fa();
+  const [signupWith2fa] = useSignUpWith2faMutation();
   const { push } = navigation;
   const {
     control,
@@ -34,7 +34,7 @@ export const AuthEmail = ({ navigation }: Props) => {
   });
 
   const onSubmit = async (data: AuthEmailForm) => {
-    const response = await signupWith2fa({ email: data.email });
+    const response = await signupWith2fa({ variables: { email: data.email } });
     push(AuthRoute.AuthCode, {
       email: data.email,
       counter: response.data?.signUpWith2fa.counter || 0,

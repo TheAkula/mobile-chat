@@ -1,7 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { Header } from "src/components";
-import { AuthStatus } from "src/generated/graphql";
-import { useUserStore } from "src/models";
+import { AuthStatus, useMyInfoQuery } from "src/generated/graphql";
 import { AuthParamList, AuthRoute } from "src/navigation/types";
 import { AuthCode } from "./auth-code";
 import { AuthEmail } from "./auth-email";
@@ -24,11 +23,11 @@ const getRoute = (status: AuthStatus | undefined) => {
 };
 
 export const Auth = () => {
-  const { user } = useUserStore();
+  const { data: userData } = useMyInfoQuery();
 
   return (
     <AuthStack.Navigator
-      initialRouteName={getRoute(user?.authStatus)}
+      initialRouteName={getRoute(userData?.myUserInfo?.authStatus)}
       screenOptions={{
         header: (props) => <Header {...props} back={!!props.back} />,
       }}

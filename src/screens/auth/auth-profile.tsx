@@ -19,7 +19,6 @@ import { AuthProfileForm } from "src/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { authProfile } from "src/utils";
 import { AuthContainer, ButtonContainer } from "./styles";
-import { useUpdateProfile } from "src/models";
 import { StackScreenProps } from "@react-navigation/stack";
 import { CompositeScreenProps } from "@react-navigation/native";
 import {
@@ -29,6 +28,7 @@ import {
   RootRoute,
 } from "src/navigation/types";
 import { ifProp } from "styled-tools";
+import { useUpdateProfileMutation } from "src/generated/graphql";
 
 type Props = CompositeScreenProps<
   StackScreenProps<AuthParamList, AuthRoute.AuthProfile>,
@@ -44,15 +44,17 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
     resolver: yupResolver(authProfile),
     mode: "onChange",
   });
-  const updateProfile = useUpdateProfile();
+  const [updateProfile] = useUpdateProfileMutation();
   const [img, setImg] = useState<ImageInfo | null>(null);
 
   const onSubmited = async (data: AuthProfileForm) => {
     await updateProfile({
-      firstName: data.firstName,
-      lastName: data.lastName,
-      avatar: img?.base64,
-      avatarExt: img?.uri.slice(img?.uri.lastIndexOf(".") + 1),
+      variables: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        avatar: img?.base64,
+        avatarExt: img?.uri.slice(img?.uri.lastIndexOf(".") + 1),
+      },
     });
     navigate(AuthRoute.AuthPassword);
   };
