@@ -1,8 +1,9 @@
 import { createStackNavigator } from "@react-navigation/stack";
+import { ActivityIndicator } from "react-native";
 import { Header } from "src/components";
 import { InviteButton } from "src/components/chat";
 import { useCurrentChatContext } from "src/context";
-import { useMyChatsQuery } from "src/generated/graphql";
+import { useChatQuery } from "src/generated/graphql";
 import { ChatParamsList, ChatRoute } from "src/navigation/types";
 import { Invite } from "./invite";
 import { Messages } from "./messages";
@@ -10,10 +11,20 @@ import { Messages } from "./messages";
 const ChatStack = createStackNavigator<ChatParamsList>();
 
 export const Chat = () => {
-  const { data: myChatsData } = useMyChatsQuery();
   const { currentChat } = useCurrentChatContext();
+  const {
+    data: chatData,
+    error,
+    loading,
+  } = useChatQuery({
+    variables: {
+      chatId: currentChat,
+    },
+  });
 
-  const chat = myChatsData?.myChats.find((c) => c.id === currentChat);
+  if (!chatData || loading) {
+    return <ActivityIndicator />;
+  }
 
   return (
     <ChatStack.Navigator screenOptions={{ headerShown: false }}>
@@ -31,12 +42,12 @@ export const Chat = () => {
             <Header
               {...props}
               back
-              buttons={!chat?.isFriendsChat ? <InviteButton /> : <></>}
+              buttons={!chatData?.chat.isFriendsChat ? <InviteButton /> : <></>}
             />
           ),
         })}
       />
-      {!chat?.isFriendsChat && (
+      {!chatData?.chat.isFriendsChat && (
         <ChatStack.Screen name={ChatRoute.Invite} component={Invite} />
       )}
     </ChatStack.Navigator>

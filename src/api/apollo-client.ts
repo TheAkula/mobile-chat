@@ -14,15 +14,16 @@ import { createClient } from "graphql-ws";
 import { AsyncStorageKey } from "src/constants";
 
 const httpLink = createHttpLink({
-  uri: "http://192.168.1.247:4000/graphql",
+  uri: "http://192.168.31.245:4000/graphql",
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://192.168.1.247:4000/graphql",
+    url: "ws://192.168.31.245:4000/graphql",
     shouldRetry(errOrCloseEvent) {
       return true;
     },
+
     connectionParams: async () => {
       const userToken = await AsyncStorage.getItem(AsyncStorageKey.USER_TOKEN);
       const params = {

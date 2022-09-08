@@ -1,8 +1,13 @@
 import { NetworkStatus } from "@apollo/client";
 import { StackScreenProps } from "@react-navigation/stack";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { MessagesList, ChatInput, ListSection } from "src/components/chat";
+import {
+  MessagesList,
+  ChatInput,
+  ListSection,
+  MessageToShow,
+} from "src/components/chat";
 import {
   Message,
   MessageSendedDocument,
@@ -11,6 +16,7 @@ import {
   MessageUpdatedDocument,
   MessageUpdatedSubscription,
   MessageUpdatedSubscriptionVariables,
+  useChatQuery,
   useMessagesQuery,
   useMyInfoQuery,
 } from "src/generated/graphql";
@@ -26,7 +32,7 @@ const transformMessages = (
   messages: DeepPartial<Message>[],
   userId: string
 ) => {
-  const data = messages
+  return messages
     .map((message) => {
       const usersIds = message.usersSeen?.map((u) => u?.id) || [];
       const isRead = usersIds.includes(userId);
@@ -43,7 +49,9 @@ const transformMessages = (
     .sort((a, b) =>
       new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime() ? -1 : 1
     );
+};
 
+const createSections = (data: MessageToShow[], isHaveRead: boolean = false) => {
   const result: ListSection[] = [];
   const dateNow = new Date();
   const nowDay = dateNow.getDate();
@@ -74,7 +82,8 @@ const transformMessages = (
       if (
         ((isRead && prevNotRead) || (!isRead && i === data.length - 1)) &&
         !haveNotRead &&
-        sectionData.length
+        sectionData.length &&
+        !isHaveRead
       ) {
         result.push({
           data: sectionData,
@@ -112,6 +121,12 @@ const transformMessages = (
 
 export const Messages = ({ route }: Props) => {
   const { chatId } = route.params;
+  const [isHaveRead, setIsHaveRead] = useState(false);
+  const { data: chatData } = useChatQuery({
+    variables: {
+      chatId,
+    },
+  });
   const { data: userData } = useMyInfoQuery();
   const {
     data: messagesData,
@@ -122,6 +137,8 @@ export const Messages = ({ route }: Props) => {
     variables: {
       id: chatId,
     },
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     notifyOnNetworkStatusChange: true,
   });
 
@@ -138,6 +155,24 @@ export const Messages = ({ route }: Props) => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    const notReadMessage = transformedMessages.find(
+      (message) => !message.isRead
+    );
+    if (!notReadMessage && !isHaveRead) {
+      setIsHaveRead(true);
+    }
+  }, [messagesData, isHaveRead]);
+
+  const transformedMessages = messagesData?.messages.data
+    ? transformMessages(
+        messagesData.messages.data,
+        userData?.myUserInfo?.id || ""
+      )
+    : [];
+
+  const sections = createSections(transformedMessages, isHaveRead);
 
   const onEndReached = () => {
     if (
@@ -170,23 +205,14 @@ export const Messages = ({ route }: Props) => {
     }
   };
 
-  const transformedMessages = messagesData?.messages.data
-    ? transformMessages(
-        messagesData.messages.data,
-        userData?.myUserInfo?.id || ""
-      )
-    : [];
-
-  const isAllRead = !transformedMessages.find((message) => message.isNotRead);
-
   return (
     <Container>
       <View style={{ flex: 1 }}>
         {networkStatus !== NetworkStatus.loading && (
           <MessagesList
-            messages={transformedMessages}
+            messages={sections}
             endReached={onEndReached}
-            isAllRead={isAllRead}
+            isFriendsChat={!!chatData?.chat.isFriendsChat}
           />
         )}
       </View>

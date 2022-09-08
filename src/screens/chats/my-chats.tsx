@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { Container } from "src/components";
 import { ChatsList } from "src/components/chats";
 import { useMyChatsQuery } from "src/generated/graphql";
@@ -8,11 +8,7 @@ export const MyChats = () => {
   const { data: myChatsData, loading: myChatsLoading } = useMyChatsQuery();
 
   if (!myChatsData?.myChats || myChatsLoading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <ActivityIndicator />;
   }
 
   return (

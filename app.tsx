@@ -3,11 +3,9 @@ import { Routes } from "src/navigation";
 import styled from "styled-components/native";
 
 export function App() {
-  const { data: userData } = useMyInfoQuery();
-
   return (
     <AppContainer>
-      {userData && <Routes userId={userData.myUserInfo.id} />}
+      <Routes />
     </AppContainer>
   );
 }

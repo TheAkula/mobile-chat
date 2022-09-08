@@ -1,13 +1,24 @@
-mutation createPersonalChat($id: String!) {
+mutation createPersonalChat($id: String!, $filter: ChatsFilter) {
   createPersonalChat(id: $id) {
     id
+    name
+    imgUrl
+    messages(filter: $filter) {
+      content
+      author {
+        id
+        firstName
+      }
+      createdAt
+    }
+    notSeen
+    isFriendsChat
     friend {
-      avatar
+      id
       firstName
       lastName
-      id
-      isActive
+      avatar
     }
-    isFriendsChat
+    
   }
 }

@@ -8,6 +8,7 @@ query chat($chatId: String!) {
       avatar
       email
     }
+    isFriendsChat
     admin {
       id
     }

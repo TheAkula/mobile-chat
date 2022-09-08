@@ -1,7 +1,13 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Controller, useForm } from "react-hook-form";
 import { Container, Input, Button } from "src/components";
-import { useSigninMutation } from "src/generated/graphql";
+import { AsyncStorageKey } from "src/constants";
+import {
+  useMyInfoLazyQuery,
+  useMyInfoQuery,
+  useSigninMutation,
+} from "src/generated/graphql";
 import { AuthSignIn as AuthSignInForm } from "src/types";
 import { authSignin } from "src/utils";
 import styled from "styled-components/native";
@@ -23,15 +29,23 @@ export const AuthSignIn = () => {
     mode: "all",
     resolver: yupResolver(authSignin),
   });
+  const [_, { refetch }] = useMyInfoLazyQuery();
   const [signin] = useSigninMutation();
 
-  const onSubmit = (data: AuthSignInForm) => {
-    signin({
+  const onSubmit = async (data: AuthSignInForm) => {
+    const response = await signin({
       variables: {
         email: data.email,
         password: data.password,
       },
     });
+
+    await AsyncStorage.setItem(
+      AsyncStorageKey.USER_TOKEN,
+      response.data?.login.userToken || ""
+    );
+
+    await refetch();
   };
 
   return (

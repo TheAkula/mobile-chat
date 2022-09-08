@@ -61,19 +61,23 @@ export const Invite = () => {
   return (
     <Container>
       <Header>Chat members</Header>
-      <ContactsList
-        contacts={chatData?.chat.users || []}
-        isRemove={isRemove}
-        remove={removedFromChat}
-      />
+      <ContactsListContainer>
+        <ContactsList
+          contacts={chatData?.chat.users || []}
+          isRemove={isRemove}
+          remove={removedFromChat}
+        />
+      </ContactsListContainer>
       <Header>Invite</Header>
-      <ContactsList
-        contacts={usersToInvite || []}
-        isRemove={isRemove}
-        isAdd={isAdd}
-        add={addedToChat}
-        remove={removedFromChat}
-      />
+      <ContactsListContainer>
+        <ContactsList
+          contacts={usersToInvite || []}
+          isRemove={isRemove}
+          isAdd={isAdd}
+          add={addedToChat}
+          remove={removedFromChat}
+        />
+      </ContactsListContainer>
     </Container>
   );
 };
@@ -84,4 +88,8 @@ const Header = styled.Text`
   color: ${({ theme }) => theme.colors.white[0]};
   margin: auto;
   margin-bottom: 30px;
+`;
+
+const ContactsListContainer = styled.View`
+  margin-bottom: 40px;
 `;

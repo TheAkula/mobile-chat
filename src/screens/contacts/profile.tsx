@@ -1,5 +1,5 @@
 import { StackScreenProps } from "@react-navigation/stack";
-import { Image, Text, View } from "react-native";
+import { ActivityIndicator, Image, Text, View } from "react-native";
 import { Avatar, Container, Btn } from "src/components";
 import { ContactsList } from "src/components/contacts";
 import {
@@ -89,11 +89,7 @@ export const Profile = ({ route, navigation }: Props) => {
   };
 
   if (!contactData || contactLoading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <ActivityIndicator size="large" />;
   }
 
   return (

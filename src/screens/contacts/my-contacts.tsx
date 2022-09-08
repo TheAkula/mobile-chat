@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { Container } from "src/components";
 import { ContactsList } from "src/components/contacts";
 import { useContactsQuery } from "src/generated/graphql";
@@ -8,11 +8,7 @@ export const MyContacts = () => {
     useContactsQuery();
 
   if (!myContactsData?.myFriends || myContactsLoading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <ActivityIndicator />;
   }
 
   return (

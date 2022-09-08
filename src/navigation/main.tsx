@@ -6,6 +6,8 @@ import {
   MoreHorizontal,
   Header,
 } from "src/components";
+import { useMyInfoQuery } from "src/generated/graphql";
+import { useMessageSended } from "src/hooks";
 import { Chats, Contacts, More } from "src/screens";
 import { AppTheme } from "src/theme";
 import { MainParamList, MainRoute } from "./types";
@@ -13,6 +15,10 @@ import { MainParamList, MainRoute } from "./types";
 const Tab = createBottomTabNavigator<MainParamList>();
 
 export const Main = () => {
+  const { data } = useMyInfoQuery();
+
+  useMessageSended(data?.myUserInfo.id as string);
+
   return (
     <Tab.Navigator
       screenOptions={{
