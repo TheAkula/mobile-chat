@@ -1,0 +1,18 @@
+mutation readMessages($messagesIds: [String!]!, $filter: ChatsFilter) {
+  readMessages(messagesIds: $messagesIds) {
+    id
+    createdAt
+    chat {
+      id
+      notSeen
+      messages(filter: $filter) {
+        content
+        author {
+          id
+          firstName
+        }
+        createdAt
+      }
+    }
+  }
+}

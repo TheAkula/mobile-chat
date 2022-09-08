@@ -22,6 +22,7 @@ import {
 import { CompositeScreenProps } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { useCurrentChatContext } from "src/context";
+import { useAddContact, useRemoveContact } from "src/hooks";
 
 type Props = CompositeScreenProps<
   StackScreenProps<ContactsParamList, ContactsRoute.Profile>,
@@ -38,8 +39,8 @@ export const Profile = ({ route, navigation }: Props) => {
     variables: { id: userId },
   });
   const { setCurrentChat } = useCurrentChatContext();
-  const [addContact] = useAddContactMutation();
-  const [removeContact] = useRemoveContactMutation();
+  const [addContact] = useAddContact();
+  const [removeContact] = useRemoveContact();
   const [createPersonalChat] = useCreatePersonalChatMutation();
 
   const addPressed = () => {

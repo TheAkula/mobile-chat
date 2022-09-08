@@ -4,5 +4,8 @@ mutation createChat($name: String!, $image: String, $imageExt: String) {
     name
     isFriendsChat
     imgUrl
+    friend {
+      id
+    }
   }
 }

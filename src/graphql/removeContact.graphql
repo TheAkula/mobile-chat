@@ -1,3 +1,9 @@
 mutation removeContact($id: String!) {
-  removeFriend(id: $id)
+  removeFriend(id: $id) {
+    id
+    isFriend
+    friends {
+      id
+    }
+  }
 }

@@ -21,8 +21,6 @@ const wsLink = new GraphQLWsLink(
   createClient({
     url: "ws://192.168.1.247:4000/graphql",
     shouldRetry(errOrCloseEvent) {
-      // console.log(errOrCloseEvent);
-
       return true;
     },
     connectionParams: async () => {
@@ -74,6 +72,33 @@ const link = split(
 export const apolloClient = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
+      Subscription: {
+        fields: {
+          messageUpdated: {
+            merge(_, incoming) {
+              return incoming;
+            },
+          },
+        },
+      },
+      User: {
+        fields: {
+          friends: {
+            merge(_, incoming) {
+              return incoming;
+            },
+          },
+        },
+      },
+      Chat: {
+        fields: {
+          users: {
+            merge(_, incoming) {
+              return incoming;
+            },
+          },
+        },
+      },
       Query: {
         fields: {
           messages: {
@@ -82,8 +107,7 @@ export const apolloClient = new ApolloClient({
             merge(existing = { data: [], nextPage: 0 }, incoming) {
               return {
                 ...existing,
-                data: [...existing.data, ...incoming.data],
-                nextPage: incoming.nextPage,
+                ...incoming,
               };
             },
           },
@@ -99,6 +123,11 @@ export const apolloClient = new ApolloClient({
             },
           },
           myChats: {
+            merge(_, incoming) {
+              return incoming;
+            },
+          },
+          myFriends: {
             merge(_, incoming) {
               return incoming;
             },

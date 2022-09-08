@@ -8,6 +8,9 @@ import {
   MessageSendedDocument,
   MessageSendedSubscription,
   MessageSendedSubscriptionVariables,
+  MessageUpdatedDocument,
+  MessageUpdatedSubscription,
+  MessageUpdatedSubscriptionVariables,
   useMessagesQuery,
   useMyInfoQuery,
 } from "src/generated/graphql";
@@ -96,8 +99,6 @@ const transformMessages = (
     }
 
     if (sectionData.length) {
-      console.log(sectionData.length);
-
       result.push({
         title,
         data: sectionData,
@@ -125,28 +126,14 @@ export const Messages = ({ route }: Props) => {
   });
 
   useEffect(() => {
-    console.log("subscribe");
     if (userData?.myUserInfo.id) {
       subscribeToMore<
-        MessageSendedSubscription,
-        MessageSendedSubscriptionVariables
+        MessageUpdatedSubscription,
+        MessageUpdatedSubscriptionVariables
       >({
-        document: MessageSendedDocument,
+        document: MessageUpdatedDocument,
         variables: {
-          userId: userData?.myUserInfo.id,
-        },
-        updateQuery(prev, { subscriptionData }) {
-          if (!subscriptionData.data.messageCreated) {
-            return prev;
-          }
-
-          return {
-            messages: {
-              ...prev.messages,
-              data: [subscriptionData.data.messageCreated],
-            },
-            myChats: [{ id: 1 }],
-          };
+          userId: userData.myUserInfo.id,
         },
       });
     }
@@ -162,6 +149,23 @@ export const Messages = ({ route }: Props) => {
           id: chatId,
           skip: messagesData.messages.data.length,
         },
+        updateQuery(previousQueryResult, { fetchMoreResult }) {
+          if (!fetchMoreResult.messages) {
+            return previousQueryResult;
+          }
+
+          return {
+            ...previousQueryResult,
+            messages: {
+              ...previousQueryResult.messages,
+              data: [
+                ...previousQueryResult.messages.data,
+                ...fetchMoreResult.messages.data,
+              ],
+              nextPage: fetchMoreResult.messages.nextPage,
+            },
+          };
+        },
       });
     }
   };
@@ -173,7 +177,7 @@ export const Messages = ({ route }: Props) => {
       )
     : [];
 
-  const isAllRead = !!transformedMessages.find((message) => message.isNotRead);
+  const isAllRead = !transformedMessages.find((message) => message.isNotRead);
 
   return (
     <Container>

@@ -1,5 +1,8 @@
 mutation removeFromChat($userId: String!, $chatId: String!) {
   removeFromChat(userId: $userId, chatId: $chatId) {
     id
+    users {
+      id
+    }
   }
 }

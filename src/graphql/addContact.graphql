@@ -1,6 +1,10 @@
 mutation addContact($friendId: String!) {
   addFriend(friendId: $friendId) {
     id
+    isFriend
+    friends {
+      id
+    }
     firstName
     lastName
     isActive

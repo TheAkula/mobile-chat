@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Chats, Container, ImagePicker, Input } from "src/components";
 import { useCreateChatMutation } from "src/generated/graphql";
+import { useCreateChat } from "src/hooks";
 import { ChatsParamsList, ChatsRoute } from "src/navigation/types";
 import { IAddChat } from "src/types";
 import { chatsAdd } from "src/utils";
@@ -25,7 +26,7 @@ export const AddChat = ({ navigation }: Props) => {
   });
 
   const [image, setImage] = useState<ImageInfo | null>(null);
-  const [createChat] = useCreateChatMutation();
+  const [createChat] = useCreateChat();
 
   const onSubmited = async (data: IAddChat) => {
     await createChat({

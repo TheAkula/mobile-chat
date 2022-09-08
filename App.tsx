@@ -1,54 +1,14 @@
-import { Text, View } from "react-native";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
-import { ThemeProvider } from "styled-components";
-import { AppTheme } from "src/theme";
-import {
-  useFonts,
-  Mulish_400Regular,
-  Mulish_700Bold,
-  Mulish_600SemiBold,
-} from "@expo-google-fonts/mulish";
+import { useMyInfoQuery } from "src/generated/graphql";
 import { Routes } from "src/navigation";
 import styled from "styled-components/native";
-import { ApolloProvider } from "@apollo/client";
-import { apolloClient } from "src/api";
-import { CurrentChatContextProvider } from "src/context";
 
-const navTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: AppTheme.colors.blue[7],
-  },
-};
-
-export default function App() {
-  const [fontsLoaded] = useFonts({
-    Mulish_400Regular,
-    Mulish_700Bold,
-    Mulish_600SemiBold,
-  });
-
-  if (!fontsLoaded) {
-    return (
-      <View>
-        <Text>Load fonts</Text>
-      </View>
-    );
-  }
+export function App() {
+  const { data: userData } = useMyInfoQuery();
 
   return (
-    <ApolloProvider client={apolloClient}>
-      <ThemeProvider theme={AppTheme}>
-        <CurrentChatContextProvider>
-          <NavigationContainer theme={navTheme}>
-            <AppContainer>
-              <Routes />
-            </AppContainer>
-          </NavigationContainer>
-        </CurrentChatContextProvider>
-      </ThemeProvider>
-    </ApolloProvider>
+    <AppContainer>
+      {userData && <Routes userId={userData.myUserInfo.id} />}
+    </AppContainer>
   );
 }
 
