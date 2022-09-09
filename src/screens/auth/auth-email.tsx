@@ -11,11 +11,13 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { AuthRoute, AuthParamList } from "src/navigation/types";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { authPhone } from "src/utils";
+import { authEmail } from "src/utils";
 import { AuthEmailForm } from "src/types";
 import { useSignUpWith2faMutation } from "src/generated/graphql";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AsyncStorageKey } from "src/constants";
 
-type Props = StackScreenProps<AuthParamList, AuthRoute.AuthPhone>;
+type Props = StackScreenProps<AuthParamList, AuthRoute.AuthEmail>;
 
 export const AuthEmail = ({ navigation }: Props) => {
   const [signupWith2fa] = useSignUpWith2faMutation();
@@ -25,7 +27,7 @@ export const AuthEmail = ({ navigation }: Props) => {
     handleSubmit,
     formState: { isValid },
   } = useForm<AuthEmailForm>({
-    resolver: yupResolver(authPhone),
+    resolver: yupResolver(authEmail),
     mode: "onChange",
 
     defaultValues: {
@@ -35,6 +37,12 @@ export const AuthEmail = ({ navigation }: Props) => {
 
   const onSubmit = async (data: AuthEmailForm) => {
     const response = await signupWith2fa({ variables: { email: data.email } });
+
+    await AsyncStorage.setItem(
+      AsyncStorageKey.USER_TOKEN,
+      response.data?.signUpWith2fa.userToken || ""
+    );
+
     push(AuthRoute.AuthCode, {
       email: data.email,
       counter: response.data?.signUpWith2fa.counter || 0,

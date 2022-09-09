@@ -9,6 +9,7 @@ export const colors = {
     "#152033", // 6
     "#0F1828", // 7
   ],
+  red: ["#E94242"],
   white: ["#F7F7FC", "#EDEDED", "#ADB5BD"],
   transparent: "transparent",
   black: ["#00000080"],

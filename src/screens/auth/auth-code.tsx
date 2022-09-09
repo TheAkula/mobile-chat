@@ -16,8 +16,13 @@ import {
   TextInput,
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
-import { Keyboard } from "react-native";
-import { useConfirmSignUpWith2faMutation } from "src/generated/graphql";
+import { ActivityIndicator, Keyboard } from "react-native";
+import {
+  useConfirmSignUpWith2faMutation,
+  useResend2faCodeMutation,
+} from "src/generated/graphql";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AsyncStorageKey } from "src/constants";
 
 type Props = StackScreenProps<AuthParamList, AuthRoute.AuthCode>;
 
@@ -25,17 +30,34 @@ export const AuthCode = ({ navigation, route: { params } }: Props) => {
   const [code, setCode] = useState<(string | undefined)[]>([...new Array(6)]);
   const { navigate } = navigation;
   const { email, counter } = params;
+  const [count, setCount] = useState(counter);
   const [isFull, setIsFull] = useState(false);
   const inputRef = useRef<TextInput>();
-  const [confirmSignupWith2fa] = useConfirmSignUpWith2faMutation();
+  const [resend2faCode, { loading: resendLoading }] =
+    useResend2faCodeMutation();
+  const [confirmSignupWith2fa, { loading: confirmLoading, error }] =
+    useConfirmSignUpWith2faMutation({
+      onError() {
+        setCode([...new Array(6)]);
+        inputRef.current?.focus();
+      },
+    });
 
   useEffect(() => {
     const nums = code.map((c) => (c ? c : "")).join("");
     if (nums.length === 6) {
       setIsFull(true);
       Keyboard.dismiss();
-      confirmSignupWith2fa({ variables: { counter, code: +nums } }).then(() => {
-        navigate(AuthRoute.AuthProfile);
+      confirmSignupWith2fa({
+        variables: { counter: count, code: +nums },
+        onCompleted(data) {
+          AsyncStorage.setItem(
+            AsyncStorageKey.USER_TOKEN,
+            data.confirmSignUpWith2fa.userToken || ""
+          ).then(() => {
+            navigate(AuthRoute.AuthProfile);
+          });
+        },
       });
     }
   }, [code]);
@@ -51,14 +73,33 @@ export const AuthCode = ({ navigation, route: { params } }: Props) => {
     }
   };
 
+  const handleResend = () => {
+    if (!resendLoading && !confirmLoading) {
+      setCode([...new Array(6)]);
+      resend2faCode({
+        variables: {
+          counter: count,
+        },
+        onCompleted(data) {
+          setCode([...new Array(6)]);
+          setCount(data.resend2faCode.counter);
+        },
+      });
+    }
+  };
+
   return (
     <AuthContainer>
       <MainContainer>
         <Wrapper>
           <Title>Enter Code</Title>
-          <Description>
-            We have sent you an email with the code to {email}
-          </Description>
+          {error ? (
+            <Error>{error.message}</Error>
+          ) : (
+            <Description>
+              We have sent you an email with the code to {email}
+            </Description>
+          )}
         </Wrapper>
         <Container>
           <TouchableWithoutFeedback onPress={handleFocus}>
@@ -83,7 +124,11 @@ export const AuthCode = ({ navigation, route: { params } }: Props) => {
       </MainContainer>
       <ButtonContainer>
         <Container>
-          <StyledText>Resend Code</StyledText>
+          {resendLoading || confirmLoading ? (
+            <ActivityIndicator size="large" />
+          ) : (
+            <StyledText onPress={handleResend}>Resend Code</StyledText>
+          )}
         </Container>
       </ButtonContainer>
     </AuthContainer>
@@ -124,4 +169,11 @@ const NumbersContainer = styled.View`
 
 const StyledTextInput = styled.TextInput`
   opacity: 0;
+`;
+
+const Error = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.normal};
+  line-height: ${({ theme }) => theme.lineHeights.normal};
+  color: ${({ theme }) => theme.colors.red[0]};
+  margin: auto;
 `;

@@ -50,6 +50,11 @@ export type ChatsFilter = {
   messagesAmount?: InputMaybe<Scalars['Int']>;
 };
 
+export type CounterResponse = {
+  __typename?: 'CounterResponse';
+  counter: Scalars['Int'];
+};
+
 export type Message = {
   __typename?: 'Message';
   author: User;
@@ -83,11 +88,14 @@ export type Mutation = {
   createChat: Chat;
   createMessage: Message;
   createPersonalChat: Chat;
+  createProfile: User;
+  createUserPassword: User;
   goOut: User;
   login: Auth;
   readMessages: Message;
   removeFriend: User;
   removeFromChat: Chat;
+  resend2faCode: CounterResponse;
   signUp: UserWithAuth;
   signUpWith2fa: TwoFactorAuth;
   upateMessage: Message;
@@ -130,6 +138,18 @@ export type MutationCreatePersonalChatArgs = {
 };
 
 
+export type MutationCreateProfileArgs = {
+  firstName: Scalars['String'];
+  lastName?: InputMaybe<Scalars['String']>;
+  upload?: InputMaybe<Upload>;
+};
+
+
+export type MutationCreateUserPasswordArgs = {
+  password: Scalars['String'];
+};
+
+
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -149,6 +169,11 @@ export type MutationRemoveFriendArgs = {
 export type MutationRemoveFromChatArgs = {
   chatId: Scalars['String'];
   userId: Scalars['String'];
+};
+
+
+export type MutationResend2faCodeArgs = {
+  counter: Scalars['Int'];
 };
 
 
@@ -262,6 +287,11 @@ export type TwoFactorAuth = {
   userToken: Scalars['String'];
 };
 
+export type Upload = {
+  base64: Scalars['String'];
+  ext: Scalars['String'];
+};
+
 export type User = {
   __typename?: 'User';
   authStatus: AuthStatus;
@@ -354,6 +384,13 @@ export type CreateChatMutationVariables = Exact<{
 
 export type CreateChatMutation = { __typename?: 'Mutation', createChat: { __typename?: 'Chat', id: string, name?: string | null, isFriendsChat: boolean, imgUrl?: string | null, friend?: { __typename?: 'User', id: string } | null } };
 
+export type CreatePasswordMutationVariables = Exact<{
+  password: Scalars['String'];
+}>;
+
+
+export type CreatePasswordMutation = { __typename?: 'Mutation', createUserPassword: { __typename?: 'User', id: string, authStatus: AuthStatus } };
+
 export type CreatePersonalChatMutationVariables = Exact<{
   id: Scalars['String'];
   filter?: InputMaybe<ChatsFilter>;
@@ -362,6 +399,15 @@ export type CreatePersonalChatMutationVariables = Exact<{
 
 export type CreatePersonalChatMutation = { __typename?: 'Mutation', createPersonalChat: { __typename?: 'Chat', id: string, name?: string | null, imgUrl?: string | null, notSeen: number, isFriendsChat: boolean, messages: Array<{ __typename?: 'Message', content: string, createdAt: any, author: { __typename?: 'User', id: string, firstName?: string | null } }>, friend?: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null } | null } };
 
+export type CreateProfileMutationVariables = Exact<{
+  firstName: Scalars['String'];
+  lastName?: InputMaybe<Scalars['String']>;
+  upload?: InputMaybe<Upload>;
+}>;
+
+
+export type CreateProfileMutation = { __typename?: 'Mutation', createProfile: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null, authStatus: AuthStatus } };
+
 export type GoOutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -369,10 +415,11 @@ export type GoOutMutation = { __typename?: 'Mutation', goOut: { __typename?: 'Us
 
 export type MessageSendedSubscriptionVariables = Exact<{
   userId: Scalars['String'];
+  filter?: InputMaybe<ChatsFilter>;
 }>;
 
 
-export type MessageSendedSubscription = { __typename?: 'Subscription', messageCreated?: { __typename?: 'Message', id: string, content: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null }, chat: { __typename?: 'Chat', id: string }, usersSeen: Array<{ __typename?: 'User', id: string }> } | null };
+export type MessageSendedSubscription = { __typename?: 'Subscription', messageCreated?: { __typename?: 'Message', id: string, content: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null }, chat: { __typename?: 'Chat', id: string, notSeen: number, imgUrl?: string | null, name?: string | null, isFriendsChat: boolean, friend?: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, avatar?: string | null } | null, messages: Array<{ __typename?: 'Message', id: string, createdAt: any, content: string, author: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null } }> }, usersSeen: Array<{ __typename?: 'User', id: string }> } | null };
 
 export type MessageUpdatedSubscriptionVariables = Exact<{
   userId: Scalars['String'];
@@ -425,6 +472,13 @@ export type RemoveFromChatMutationVariables = Exact<{
 
 
 export type RemoveFromChatMutation = { __typename?: 'Mutation', removeFromChat: { __typename?: 'Chat', id: string, users: Array<{ __typename?: 'User', id: string }> } };
+
+export type Resend2faCodeMutationVariables = Exact<{
+  counter: Scalars['Int'];
+}>;
+
+
+export type Resend2faCodeMutation = { __typename?: 'Mutation', resend2faCode: { __typename?: 'CounterResponse', counter: number } };
 
 export type SendMessageMutationVariables = Exact<{
   content: Scalars['String'];
@@ -754,6 +808,40 @@ export function useCreateChatMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateChatMutationHookResult = ReturnType<typeof useCreateChatMutation>;
 export type CreateChatMutationResult = Apollo.MutationResult<CreateChatMutation>;
 export type CreateChatMutationOptions = Apollo.BaseMutationOptions<CreateChatMutation, CreateChatMutationVariables>;
+export const CreatePasswordDocument = gql`
+    mutation createPassword($password: String!) {
+  createUserPassword(password: $password) {
+    id
+    authStatus
+  }
+}
+    `;
+export type CreatePasswordMutationFn = Apollo.MutationFunction<CreatePasswordMutation, CreatePasswordMutationVariables>;
+
+/**
+ * __useCreatePasswordMutation__
+ *
+ * To run a mutation, you first call `useCreatePasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPasswordMutation, { data, loading, error }] = useCreatePasswordMutation({
+ *   variables: {
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useCreatePasswordMutation(baseOptions?: Apollo.MutationHookOptions<CreatePasswordMutation, CreatePasswordMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePasswordMutation, CreatePasswordMutationVariables>(CreatePasswordDocument, options);
+      }
+export type CreatePasswordMutationHookResult = ReturnType<typeof useCreatePasswordMutation>;
+export type CreatePasswordMutationResult = Apollo.MutationResult<CreatePasswordMutation>;
+export type CreatePasswordMutationOptions = Apollo.BaseMutationOptions<CreatePasswordMutation, CreatePasswordMutationVariables>;
 export const CreatePersonalChatDocument = gql`
     mutation createPersonalChat($id: String!, $filter: ChatsFilter) {
   createPersonalChat(id: $id) {
@@ -806,6 +894,45 @@ export function useCreatePersonalChatMutation(baseOptions?: Apollo.MutationHookO
 export type CreatePersonalChatMutationHookResult = ReturnType<typeof useCreatePersonalChatMutation>;
 export type CreatePersonalChatMutationResult = Apollo.MutationResult<CreatePersonalChatMutation>;
 export type CreatePersonalChatMutationOptions = Apollo.BaseMutationOptions<CreatePersonalChatMutation, CreatePersonalChatMutationVariables>;
+export const CreateProfileDocument = gql`
+    mutation createProfile($firstName: String!, $lastName: String, $upload: Upload) {
+  createProfile(firstName: $firstName, lastName: $lastName, upload: $upload) {
+    id
+    firstName
+    lastName
+    avatar
+    authStatus
+  }
+}
+    `;
+export type CreateProfileMutationFn = Apollo.MutationFunction<CreateProfileMutation, CreateProfileMutationVariables>;
+
+/**
+ * __useCreateProfileMutation__
+ *
+ * To run a mutation, you first call `useCreateProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createProfileMutation, { data, loading, error }] = useCreateProfileMutation({
+ *   variables: {
+ *      firstName: // value for 'firstName'
+ *      lastName: // value for 'lastName'
+ *      upload: // value for 'upload'
+ *   },
+ * });
+ */
+export function useCreateProfileMutation(baseOptions?: Apollo.MutationHookOptions<CreateProfileMutation, CreateProfileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateProfileMutation, CreateProfileMutationVariables>(CreateProfileDocument, options);
+      }
+export type CreateProfileMutationHookResult = ReturnType<typeof useCreateProfileMutation>;
+export type CreateProfileMutationResult = Apollo.MutationResult<CreateProfileMutation>;
+export type CreateProfileMutationOptions = Apollo.BaseMutationOptions<CreateProfileMutation, CreateProfileMutationVariables>;
 export const GoOutDocument = gql`
     mutation goOut {
   goOut {
@@ -839,7 +966,7 @@ export type GoOutMutationHookResult = ReturnType<typeof useGoOutMutation>;
 export type GoOutMutationResult = Apollo.MutationResult<GoOutMutation>;
 export type GoOutMutationOptions = Apollo.BaseMutationOptions<GoOutMutation, GoOutMutationVariables>;
 export const MessageSendedDocument = gql`
-    subscription messageSended($userId: String!) {
+    subscription messageSended($userId: String!, $filter: ChatsFilter) {
   messageCreated(userId: $userId) {
     id
     author {
@@ -851,6 +978,26 @@ export const MessageSendedDocument = gql`
     content
     chat {
       id
+      notSeen
+      imgUrl
+      name
+      friend {
+        id
+        firstName
+        lastName
+        avatar
+      }
+      isFriendsChat
+      messages(filter: $filter) {
+        id
+        createdAt
+        content
+        author {
+          id
+          firstName
+          lastName
+        }
+      }
     }
     createdAt
     updatedAt
@@ -874,6 +1021,7 @@ export const MessageSendedDocument = gql`
  * const { data, loading, error } = useMessageSendedSubscription({
  *   variables: {
  *      userId: // value for 'userId'
+ *      filter: // value for 'filter'
  *   },
  * });
  */
@@ -1185,6 +1333,39 @@ export function useRemoveFromChatMutation(baseOptions?: Apollo.MutationHookOptio
 export type RemoveFromChatMutationHookResult = ReturnType<typeof useRemoveFromChatMutation>;
 export type RemoveFromChatMutationResult = Apollo.MutationResult<RemoveFromChatMutation>;
 export type RemoveFromChatMutationOptions = Apollo.BaseMutationOptions<RemoveFromChatMutation, RemoveFromChatMutationVariables>;
+export const Resend2faCodeDocument = gql`
+    mutation resend2faCode($counter: Int!) {
+  resend2faCode(counter: $counter) {
+    counter
+  }
+}
+    `;
+export type Resend2faCodeMutationFn = Apollo.MutationFunction<Resend2faCodeMutation, Resend2faCodeMutationVariables>;
+
+/**
+ * __useResend2faCodeMutation__
+ *
+ * To run a mutation, you first call `useResend2faCodeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResend2faCodeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resend2faCodeMutation, { data, loading, error }] = useResend2faCodeMutation({
+ *   variables: {
+ *      counter: // value for 'counter'
+ *   },
+ * });
+ */
+export function useResend2faCodeMutation(baseOptions?: Apollo.MutationHookOptions<Resend2faCodeMutation, Resend2faCodeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<Resend2faCodeMutation, Resend2faCodeMutationVariables>(Resend2faCodeDocument, options);
+      }
+export type Resend2faCodeMutationHookResult = ReturnType<typeof useResend2faCodeMutation>;
+export type Resend2faCodeMutationResult = Apollo.MutationResult<Resend2faCodeMutation>;
+export type Resend2faCodeMutationOptions = Apollo.BaseMutationOptions<Resend2faCodeMutation, Resend2faCodeMutationVariables>;
 export const SendMessageDocument = gql`
     mutation sendMessage($content: String!, $chatId: String!) {
   createMessage(content: $content, chatId: $chatId) {

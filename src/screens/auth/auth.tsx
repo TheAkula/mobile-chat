@@ -1,6 +1,14 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createStackNavigator } from "@react-navigation/stack";
+import { useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native";
 import { Header } from "src/components";
-import { AuthStatus, useMyInfoQuery } from "src/generated/graphql";
+import { AsyncStorageKey } from "src/constants";
+import {
+  AuthStatus,
+  useMyInfoLazyQuery,
+  useMyInfoQuery,
+} from "src/generated/graphql";
 import { AuthParamList, AuthRoute } from "src/navigation/types";
 import { AuthCode } from "./auth-code";
 import { AuthEmail } from "./auth-email";
@@ -23,7 +31,26 @@ const getRoute = (status: AuthStatus | undefined) => {
 };
 
 export const Auth = () => {
-  const { data: userData } = useMyInfoQuery();
+  const [fetchInfo, { data: userData, loading }] = useMyInfoLazyQuery();
+  const [isFetched, setIsFetched] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem(AsyncStorageKey.USER_TOKEN).then((token) => {
+      if (token) {
+        fetchInfo({
+          onCompleted() {
+            setIsFetched(true);
+          },
+        });
+      } else {
+        setIsFetched(true);
+      }
+    });
+  }, [userData]);
+
+  if (loading || !isFetched) {
+    return <ActivityIndicator size="large" />;
+  }
 
   return (
     <AuthStack.Navigator
@@ -32,7 +59,7 @@ export const Auth = () => {
         header: (props) => <Header {...props} back={!!props.back} />,
       }}
     >
-      <AuthStack.Screen name={AuthRoute.AuthPhone} component={AuthEmail} />
+      <AuthStack.Screen name={AuthRoute.AuthEmail} component={AuthEmail} />
       <AuthStack.Screen name={AuthRoute.AuthCode} component={AuthCode} />
       <AuthStack.Screen name={AuthRoute.AuthProfile} component={AuthProfile} />
       <AuthStack.Screen name={AuthRoute.AuthWelcome} component={Welcome} />

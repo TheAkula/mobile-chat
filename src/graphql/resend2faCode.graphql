@@ -1,0 +1,5 @@
+mutation resend2faCode($counter: Int!) {
+  resend2faCode(counter: $counter) {
+    counter
+  }
+}

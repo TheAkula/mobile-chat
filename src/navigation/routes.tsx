@@ -1,5 +1,5 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import { StatusBar, Text, View } from "react-native";
+import { ActivityIndicator, StatusBar, Text, View } from "react-native";
 import { Chevron, Header } from "src/components";
 import { Auth, Chat } from "src/screens";
 import { Main } from "./main";
@@ -26,6 +26,7 @@ import {
 } from "src/generated/graphql";
 import { useAppState } from "@react-native-community/hooks";
 import { useMessageSended } from "src/hooks";
+import { apolloClient } from "src/api";
 
 const RootStack = createStackNavigator<RootParamList>();
 
@@ -33,15 +34,23 @@ export const Routes = () => {
   const appState = useAppState();
   const [activateUser] = useActivateMutation();
   const [goOut] = useGoOutMutation();
-  const { data: userData, loading } = useMyInfoQuery();
+  const { data: userData, loading, error } = useMyInfoQuery();
 
   useEffect(() => {
-    if (appState === "active") {
-      activateUser();
-    } else {
-      goOut();
+    if (userData) {
+      if (appState === "active") {
+        activateUser();
+      } else {
+        goOut();
+      }
     }
-  }, [appState]);
+  }, [appState, userData]);
+
+  if (loading) {
+    return <ActivityIndicator size="large" />;
+  }
+
+  const isUnauthorized = error?.message === "Unauthorized";
 
   return (
     <>
@@ -61,13 +70,15 @@ export const Routes = () => {
           headerShadowVisible: false,
         })}
       >
-        {userData?.myUserInfo?.authStatus === AuthStatus.HaveAccount && (
-          <>
-            <RootStack.Screen name={RootRoute.Main} component={Main} />
-            <RootStack.Screen name={RootRoute.Chat} component={Chat} />
-          </>
-        )}
-        {userData?.myUserInfo?.authStatus !== AuthStatus.HaveAccount && (
+        {!isUnauthorized &&
+          userData?.myUserInfo?.authStatus === AuthStatus.HaveAccount && (
+            <>
+              <RootStack.Screen name={RootRoute.Main} component={Main} />
+              <RootStack.Screen name={RootRoute.Chat} component={Chat} />
+            </>
+          )}
+        {(isUnauthorized ||
+          userData?.myUserInfo?.authStatus !== AuthStatus.HaveAccount) && (
           <RootStack.Screen
             name={RootRoute.Auth}
             component={Auth}

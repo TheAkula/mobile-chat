@@ -43,7 +43,7 @@ export const Chat = ({ item }: Props) => {
       screen: ChatRoute.Messages,
       params: {
         name: item.isFriendsChat
-          ? [item.friend?.firstName, item.friend?.lastName].join(" ")
+          ? [item.friend?.firstName, item.friend?.lastName || ""].join(" ")
           : item.name || "",
         chatId: item.id || "",
       },
@@ -68,7 +68,10 @@ export const Chat = ({ item }: Props) => {
               ) : (
                 <Title>
                   {item.isFriendsChat
-                    ? [item.friend?.firstName?.[0], item.friend?.lastName?.[0]]
+                    ? [
+                        item.friend?.firstName?.[0],
+                        item.friend?.lastName?.[0] || "",
+                      ]
                         .join("")
                         .toUpperCase()
                     : item.name?.[0].toUpperCase()}

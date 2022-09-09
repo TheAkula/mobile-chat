@@ -22,7 +22,7 @@ export const Welcome = ({ navigation: { push } }: Props) => {
       </Wrapper>
       <Container>
         <ButtonContainer>
-          <Button onPress={() => push(AuthRoute.AuthPhone)}>Sign up</Button>
+          <Button onPress={() => push(AuthRoute.AuthEmail)}>Sign up</Button>
         </ButtonContainer>
         <ButtonContainer>
           <Button

@@ -4,6 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Container, Input, Button } from "src/components";
 import { AsyncStorageKey } from "src/constants";
 import {
+  MyInfoDocument,
   useMyInfoLazyQuery,
   useMyInfoQuery,
   useSigninMutation,
@@ -29,7 +30,7 @@ export const AuthSignIn = () => {
     mode: "all",
     resolver: yupResolver(authSignin),
   });
-  const [_, { refetch }] = useMyInfoLazyQuery();
+  const [fetchInfo, { data, refetch }] = useMyInfoLazyQuery();
   const [signin] = useSigninMutation();
 
   const onSubmit = async (data: AuthSignInForm) => {
@@ -45,7 +46,7 @@ export const AuthSignIn = () => {
       response.data?.login.userToken || ""
     );
 
-    await refetch();
+    await fetchInfo();
   };
 
   return (

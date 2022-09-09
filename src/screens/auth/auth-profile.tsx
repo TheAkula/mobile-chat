@@ -28,7 +28,10 @@ import {
   RootRoute,
 } from "src/navigation/types";
 import { ifProp } from "styled-tools";
-import { useUpdateProfileMutation } from "src/generated/graphql";
+import {
+  useCreateProfileMutation,
+  useUpdateProfileMutation,
+} from "src/generated/graphql";
 
 type Props = CompositeScreenProps<
   StackScreenProps<AuthParamList, AuthRoute.AuthProfile>,
@@ -44,18 +47,25 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
     resolver: yupResolver(authProfile),
     mode: "onChange",
   });
-  const [updateProfile] = useUpdateProfileMutation();
+  const [createProfile] = useCreateProfileMutation();
   const [img, setImg] = useState<ImageInfo | null>(null);
 
   const onSubmited = async (data: AuthProfileForm) => {
-    await updateProfile({
+    const upload = img?.base64
+      ? {
+          base64: img.base64,
+          ext: img.uri.slice(img?.uri.lastIndexOf(".") + 1),
+        }
+      : undefined;
+
+    await createProfile({
       variables: {
         firstName: data.firstName,
         lastName: data.lastName,
-        avatar: img?.base64,
-        avatarExt: img?.uri.slice(img?.uri.lastIndexOf(".") + 1),
+        upload,
       },
     });
+
     navigate(AuthRoute.AuthPassword);
   };
 

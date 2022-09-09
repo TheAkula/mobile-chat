@@ -1,4 +1,4 @@
-subscription messageSended($userId: String!) {
+subscription messageSended($userId: String!, $filter: ChatsFilter) {
   messageCreated(userId: $userId) {
     id
     author {
@@ -10,6 +10,26 @@ subscription messageSended($userId: String!) {
     content
     chat {
       id
+      notSeen
+      imgUrl
+      name
+      friend {
+        id
+        firstName
+        lastName
+        avatar
+      }
+      isFriendsChat
+      messages(filter: $filter) {
+        id
+        createdAt
+        content
+        author {
+          id
+          firstName
+          lastName
+        }
+      }
     }
     createdAt
     updatedAt

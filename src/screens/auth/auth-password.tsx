@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { Container, Input, Button } from "src/components";
-import { useUpdateProfileMutation } from "src/generated/graphql";
+import { useCreatePasswordMutation } from "src/generated/graphql";
 import { AuthPassword as AuthPasswordForm } from "src/types";
 import { authPassword } from "src/utils";
 import {
@@ -22,10 +22,10 @@ export const AuthPassword = () => {
     mode: "all",
     resolver: yupResolver(authPassword),
   });
-  const [updateProfile] = useUpdateProfileMutation();
+  const [createPassword] = useCreatePasswordMutation();
 
   const onSubmit = async (data: AuthPasswordForm) => {
-    await updateProfile({
+    await createPassword({
       variables: {
         password: data.password,
       },

@@ -7,7 +7,7 @@ export enum RootRoute {
 }
 
 export enum AuthRoute {
-  AuthPhone = "AuthPhone",
+  AuthEmail = "AuthEmail",
   AuthCode = "AuthCode",
   AuthProfile = "AuthProfile",
   AuthWelcome = "AuthWelcome",
@@ -48,7 +48,7 @@ export type RootParamList = {
 };
 
 export type AuthParamList = {
-  [AuthRoute.AuthPhone]: undefined;
+  [AuthRoute.AuthEmail]: undefined;
   [AuthRoute.AuthCode]: { email: string; counter: number };
   [AuthRoute.AuthProfile]: undefined;
   [AuthRoute.AuthWelcome]: undefined;

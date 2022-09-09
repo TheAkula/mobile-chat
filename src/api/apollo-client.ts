@@ -14,18 +14,19 @@ import { createClient } from "graphql-ws";
 import { AsyncStorageKey } from "src/constants";
 
 const httpLink = createHttpLink({
-  uri: "http://192.168.31.245:4000/graphql",
+  uri: "http://192.168.1.247:4000/graphql",
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://192.168.31.245:4000/graphql",
+    url: "ws://192.168.1.247:4000/graphql",
     shouldRetry(errOrCloseEvent) {
       return true;
     },
 
     connectionParams: async () => {
       const userToken = await AsyncStorage.getItem(AsyncStorageKey.USER_TOKEN);
+
       const params = {
         isWebSocket: true,
         authorization: "Bearer " + userToken,
@@ -51,7 +52,7 @@ const errorLink = onError(({ networkError, graphQLErrors }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach((graphqlError) => {
       if (graphqlError.message === "Unauthorized") {
-        AsyncStorage.setItem(AsyncStorageKey.USER_TOKEN, "").then(() => {});
+        AsyncStorage.setItem(AsyncStorageKey.USER_TOKEN, "");
       }
     });
   }
@@ -73,6 +74,15 @@ const link = split(
 export const apolloClient = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
+      Message: {
+        fields: {
+          usersSeen: {
+            merge(_, incoming) {
+              return incoming;
+            },
+          },
+        },
+      },
       Subscription: {
         fields: {
           messageUpdated: {
@@ -94,6 +104,11 @@ export const apolloClient = new ApolloClient({
       Chat: {
         fields: {
           users: {
+            merge(_, incoming) {
+              return incoming;
+            },
+          },
+          messages: {
             merge(_, incoming) {
               return incoming;
             },

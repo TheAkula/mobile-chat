@@ -48,7 +48,7 @@ export const Contact = ({ item, add, remove, isAdd, isRemove }: Props) => {
     remove && item.id && remove(item.id);
   };
 
-  const userName = [item.firstName, item.lastName].join(" ");
+  const userName = [item.firstName, item.lastName || ""].join(" ");
   const isMe = item.id === data?.myUserInfo?.id;
 
   const handlePress = () => {

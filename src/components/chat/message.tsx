@@ -1,4 +1,4 @@
-import { Image } from "react-native";
+import { Image, TouchableOpacity } from "react-native";
 import { Message as MessageType } from "src/generated/graphql";
 import { DeepPartial } from "src/types";
 import { getDateHm } from "src/utils";
@@ -6,6 +6,19 @@ import styled, { css } from "styled-components/native";
 import { ifProp } from "styled-tools";
 import { Avatar } from "src/components";
 import { MessageToShow } from "./types";
+import {
+  CompositeNavigationProp,
+  useNavigation,
+} from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import {
+  ChatParamsList,
+  ChatRoute,
+  ContactsRoute,
+  MainRoute,
+  RootParamList,
+  RootRoute,
+} from "src/navigation/types";
 
 type WithIsMine = {
   isMine?: boolean;
@@ -16,6 +29,11 @@ type Props = MessageToShow &
     isFriendsChat?: boolean;
   };
 
+type NavProp = CompositeNavigationProp<
+  StackNavigationProp<ChatParamsList, ChatRoute.Messages>,
+  StackNavigationProp<RootParamList, RootRoute.Chat>
+>;
+
 export const Message = ({
   isMine,
   content,
@@ -25,23 +43,43 @@ export const Message = ({
   updatedAt,
   isMyRead,
 }: Props) => {
+  const { push } = useNavigation<NavProp>();
+
   const date = createdAt === updatedAt ? createdAt : "Edited " + updatedAt;
+
+  const userName =
+    author && [author.firstName, author.lastName || ""].join(" ");
+
+  const onPressed = () => {
+    if (author) {
+      push(RootRoute.Main, {
+        screen: MainRoute.Contacts,
+        params: {
+          screen: ContactsRoute.Profile,
+          params: {
+            name: userName,
+            userId: author.id,
+          },
+        },
+      });
+    }
+  };
 
   return (
     <Wrapper isMine={isMine}>
       {!isMine && !isFriendsChat && (
-        <ImageContainer>
-          {author?.avatar ? (
-            <Image source={{ uri: author?.avatar }} />
-          ) : (
-            <Avatar width={26} height={26} />
-          )}
-        </ImageContainer>
+        <TouchableOpacity onPress={onPressed}>
+          <ImageContainer>
+            {author?.avatar ? (
+              <Image source={{ uri: author?.avatar, width: 40, height: 40 }} />
+            ) : (
+              <Avatar width={26} height={26} />
+            )}
+          </ImageContainer>
+        </TouchableOpacity>
       )}
       <MessageContainer isMine={isMine}>
-        {!isFriendsChat && !isMine && (
-          <Name>{[author?.firstName, author?.lastName || ""].join(" ")}</Name>
-        )}
+        {!isFriendsChat && !isMine && <Name>{userName}</Name>}
         <MessageText>{content}</MessageText>
         <MessageDate isMine={isMine}>
           {getDateHm(date)}
@@ -87,6 +125,7 @@ const MessageContainer = styled.View<WithIsMine>`
   align-self: ${ifProp("isMine", "flex-end", "flex-start")};
   margin-bottom: 12px;
   max-width: 80%;
+  min-width: 80px;
 `;
 
 const Name = styled.Text`

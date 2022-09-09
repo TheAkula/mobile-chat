@@ -1,0 +1,13 @@
+mutation createProfile(
+  $firstName: String!
+  $lastName: String
+  $upload: Upload
+) {
+  createProfile(firstName: $firstName, lastName: $lastName, upload: $upload) {
+    id
+    firstName
+    lastName
+    avatar
+    authStatus
+  }
+}

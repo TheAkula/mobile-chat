@@ -75,7 +75,7 @@ export const Profile = ({ route, navigation }: Props) => {
         name:
           res.data?.createPersonalChat.friend?.firstName +
           " " +
-          res.data?.createPersonalChat.friend?.lastName,
+          (res.data?.createPersonalChat.friend?.lastName || ""),
       },
     });
   };
@@ -105,7 +105,9 @@ export const Profile = ({ route, navigation }: Props) => {
           )}
         </ImageContainer>
         <Info>
-          <Name>{`${contactData.user.firstName} ${contactData.user.lastName}`}</Name>
+          <Name>{`${contactData.user.firstName} ${
+            contactData.user.lastName || ""
+          }`}</Name>
 
           <StyledText>
             {contactData.user.isActive

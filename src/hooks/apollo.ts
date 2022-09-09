@@ -142,11 +142,9 @@ export const useMessageSended = (userId: string) =>
         (chat) => chat.id === subscriptionData.data?.messageCreated?.chat.id
       );
 
+      const updatedChats = [...(chats?.myChats || [])];
+      const isMine = subscriptionData.data.messageCreated.author.id === userId;
       if (exChatIndex !== undefined && exChatIndex !== -1) {
-        const updatedChats = [...(chats?.myChats || [])];
-        const isMine =
-          subscriptionData.data.messageCreated.author.id === userId;
-
         updatedChats[exChatIndex] = {
           ...updatedChats[exChatIndex],
           notSeen: updatedChats[exChatIndex].notSeen + (!isMine ? 1 : 0),
@@ -155,14 +153,15 @@ export const useMessageSended = (userId: string) =>
             ...updatedChats[exChatIndex].messages,
           ],
         };
-
-        client.writeQuery<MyChatsQuery>({
-          query: MyChatsDocument,
-          data: {
-            myChats: updatedChats,
-          },
-        });
+      } else {
+        updatedChats.push(subscriptionData.data.messageCreated.chat);
       }
+      client.writeQuery<MyChatsQuery>({
+        query: MyChatsDocument,
+        data: {
+          myChats: updatedChats,
+        },
+      });
     },
   });
 
