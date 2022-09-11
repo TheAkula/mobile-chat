@@ -1,7 +1,12 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
+import { ActivityIndicator } from "react-native";
 import { Container, Input, Button } from "src/components";
-import { useCreatePasswordMutation } from "src/generated/graphql";
+import {
+  MyInfoDocument,
+  MyInfoQuery,
+  useCreatePasswordMutation,
+} from "src/generated/graphql";
 import { AuthPassword as AuthPasswordForm } from "src/types";
 import { authPassword } from "src/utils";
 import {
@@ -22,14 +27,27 @@ export const AuthPassword = () => {
     mode: "all",
     resolver: yupResolver(authPassword),
   });
-  const [createPassword] = useCreatePasswordMutation();
+  const [createPassword, { loading }] = useCreatePasswordMutation({
+    update(client, { data }) {
+      if (data) {
+        client.writeQuery<MyInfoQuery>({
+          query: MyInfoDocument,
+          data: {
+            myUserInfo: data.createUserPassword,
+          },
+        });
+      }
+    },
+  });
 
   const onSubmit = async (data: AuthPasswordForm) => {
-    await createPassword({
-      variables: {
-        password: data.password,
-      },
-    });
+    if (!loading) {
+      await createPassword({
+        variables: {
+          password: data.password,
+        },
+      });
+    }
   };
 
   return (
@@ -57,7 +75,7 @@ export const AuthPassword = () => {
       <ButtonContainer>
         <Container>
           <Button disabled={!isValid} onPress={handleSubmit(onSubmit)}>
-            Continue
+            {loading ? <ActivityIndicator /> : "Save"}
           </Button>
         </Container>
       </ButtonContainer>

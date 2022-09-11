@@ -1,6 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Controller, useForm } from "react-hook-form";
+import { ActivityIndicator } from "react-native";
 import { Container, Input, Button } from "src/components";
 import { AsyncStorageKey } from "src/constants";
 import {
@@ -30,23 +31,25 @@ export const AuthSignIn = () => {
     mode: "all",
     resolver: yupResolver(authSignin),
   });
-  const [fetchInfo, { data, refetch }] = useMyInfoLazyQuery();
+  const [fetchInfo, { loading }] = useMyInfoLazyQuery();
   const [signin] = useSigninMutation();
 
   const onSubmit = async (data: AuthSignInForm) => {
-    const response = await signin({
-      variables: {
-        email: data.email,
-        password: data.password,
-      },
-    });
+    if (!loading) {
+      const response = await signin({
+        variables: {
+          email: data.email,
+          password: data.password,
+        },
+      });
 
-    await AsyncStorage.setItem(
-      AsyncStorageKey.USER_TOKEN,
-      response.data?.login.userToken || ""
-    );
+      await AsyncStorage.setItem(
+        AsyncStorageKey.USER_TOKEN,
+        response.data?.login.userToken || ""
+      );
 
-    await fetchInfo();
+      await fetchInfo();
+    }
   };
 
   return (
@@ -90,7 +93,7 @@ export const AuthSignIn = () => {
       <ButtonContainer>
         <Container>
           <Button disabled={!isValid} onPress={handleSubmit(onSubmit)}>
-            Continue
+            {loading ? <ActivityIndicator /> : "Continue"}
           </Button>
         </Container>
       </ButtonContainer>

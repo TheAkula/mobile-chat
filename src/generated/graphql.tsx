@@ -389,7 +389,7 @@ export type CreatePasswordMutationVariables = Exact<{
 }>;
 
 
-export type CreatePasswordMutation = { __typename?: 'Mutation', createUserPassword: { __typename?: 'User', id: string, authStatus: AuthStatus } };
+export type CreatePasswordMutation = { __typename?: 'Mutation', createUserPassword: { __typename?: 'User', id: string, firstName?: string | null, lastName?: string | null, email: string, avatar?: string | null, authStatus: AuthStatus } };
 
 export type CreatePersonalChatMutationVariables = Exact<{
   id: Scalars['String'];
@@ -812,6 +812,10 @@ export const CreatePasswordDocument = gql`
     mutation createPassword($password: String!) {
   createUserPassword(password: $password) {
     id
+    firstName
+    lastName
+    email
+    avatar
     authStatus
   }
 }

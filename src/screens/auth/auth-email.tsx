@@ -16,11 +16,12 @@ import { AuthEmailForm } from "src/types";
 import { useSignUpWith2faMutation } from "src/generated/graphql";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AsyncStorageKey } from "src/constants";
+import { ActivityIndicator } from "react-native";
 
 type Props = StackScreenProps<AuthParamList, AuthRoute.AuthEmail>;
 
 export const AuthEmail = ({ navigation }: Props) => {
-  const [signupWith2fa] = useSignUpWith2faMutation();
+  const [signupWith2fa, { loading }] = useSignUpWith2faMutation();
   const { push } = navigation;
   const {
     control,
@@ -36,17 +37,21 @@ export const AuthEmail = ({ navigation }: Props) => {
   });
 
   const onSubmit = async (data: AuthEmailForm) => {
-    const response = await signupWith2fa({ variables: { email: data.email } });
+    if (!loading) {
+      const response = await signupWith2fa({
+        variables: { email: data.email },
+      });
 
-    await AsyncStorage.setItem(
-      AsyncStorageKey.USER_TOKEN,
-      response.data?.signUpWith2fa.userToken || ""
-    );
+      await AsyncStorage.setItem(
+        AsyncStorageKey.USER_TOKEN,
+        response.data?.signUpWith2fa.userToken || ""
+      );
 
-    push(AuthRoute.AuthCode, {
-      email: data.email,
-      counter: response.data?.signUpWith2fa.counter || 0,
-    });
+      push(AuthRoute.AuthCode, {
+        email: data.email,
+        counter: response.data?.signUpWith2fa.counter || 0,
+      });
+    }
   };
 
   return (
@@ -75,7 +80,7 @@ export const AuthEmail = ({ navigation }: Props) => {
       <ButtonContainer>
         <Container>
           <Button disabled={!isValid} onPress={handleSubmit(onSubmit)}>
-            Continue
+            {loading ? <ActivityIndicator /> : "Continue"}
           </Button>
         </Container>
       </ButtonContainer>

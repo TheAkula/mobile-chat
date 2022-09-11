@@ -14,12 +14,12 @@ import { createClient } from "graphql-ws";
 import { AsyncStorageKey } from "src/constants";
 
 const httpLink = createHttpLink({
-  uri: "http://192.168.1.247:4000/graphql",
+  uri: "http://172.17.0.1:4000/graphql",
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://192.168.1.247:4000/graphql",
+    url: "ws://172.17.0.1:4000/graphql",
     shouldRetry(errOrCloseEvent) {
       return true;
     },
@@ -117,6 +117,14 @@ export const apolloClient = new ApolloClient({
       },
       Query: {
         fields: {
+          myUserInfo: {
+            merge(existing = {}, incoming) {
+              return {
+                ...existing,
+                ...incoming,
+              };
+            },
+          },
           messages: {
             keyArgs: ["filter", "id"],
 

@@ -1,4 +1,4 @@
-import { Image } from "react-native";
+import { ActivityIndicator, Image } from "react-native";
 import {
   ImageInfo,
   launchImageLibraryAsync,
@@ -47,26 +47,28 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
     resolver: yupResolver(authProfile),
     mode: "onChange",
   });
-  const [createProfile] = useCreateProfileMutation();
+  const [createProfile, { loading }] = useCreateProfileMutation();
   const [img, setImg] = useState<ImageInfo | null>(null);
 
   const onSubmited = async (data: AuthProfileForm) => {
-    const upload = img?.base64
-      ? {
-          base64: img.base64,
-          ext: img.uri.slice(img?.uri.lastIndexOf(".") + 1),
-        }
-      : undefined;
+    if (!loading) {
+      const upload = img?.base64
+        ? {
+            base64: img.base64,
+            ext: img.uri.slice(img?.uri.lastIndexOf(".") + 1),
+          }
+        : undefined;
 
-    await createProfile({
-      variables: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        upload,
-      },
-    });
+      await createProfile({
+        variables: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          upload,
+        },
+      });
 
-    navigate(AuthRoute.AuthPassword);
+      navigate(AuthRoute.AuthPassword);
+    }
   };
 
   return (
@@ -109,7 +111,7 @@ export const AuthProfile = ({ navigation: { navigate } }: Props) => {
       <Container>
         <ButtonContainer>
           <Button disabled={!isValid} onPress={handleSubmit(onSubmited)}>
-            Save
+            {loading ? <ActivityIndicator /> : "Continue"}
           </Button>
         </ButtonContainer>
       </Container>

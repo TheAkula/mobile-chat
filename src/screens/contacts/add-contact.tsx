@@ -1,6 +1,6 @@
 import { debounce } from "lodash";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { Container, SearchInput } from "src/components";
 import { ContactsList } from "src/components/contacts";
 import {
@@ -20,7 +20,8 @@ import { AppTheme } from "src/theme";
 import styled from "styled-components/native";
 
 export const AddContact = () => {
-  const [fetchUsers, { data: usersData, fetchMore }] = useUsersLazyQuery();
+  const [fetchUsers, { data: usersData, fetchMore, loading }] =
+    useUsersLazyQuery({ notifyOnNetworkStatusChange: true });
   const [addContact] = useAddContact();
   const [removeContact] = useRemoveContact();
   const [searchValue, setSearchValue] = useState("");
@@ -58,19 +59,21 @@ export const AddContact = () => {
     }
   };
 
+  const refetchUsers = (value: string) => {
+    return fetchUsers({
+      variables: {
+        page: 0,
+        filter: {
+          name: value,
+        },
+      },
+    });
+  };
+
   const onChangedSearchValue = (value: string) => {
     setSearchValue(value);
 
-    debounce(() => {
-      fetchUsers({
-        variables: {
-          page: 0,
-          filter: {
-            name: value,
-          },
-        },
-      });
-    }, 1000)();
+    debounce(refetchUsers, 1000)(value);
   };
 
   const isAdd = (item: Partial<User>) => {
@@ -90,14 +93,18 @@ export const AddContact = () => {
             onChangeText={onChangedSearchValue}
           />
         </SearchContainer>
-        <ContactsList
-          contacts={usersData?.users.data || []}
-          add={addedContact}
-          isAdd={isAdd}
-          isRemove={isRemove}
-          remove={removedContact}
-          endReached={onEndReached}
-        />
+        {loading ? (
+          <ActivityIndicator size="large" style={{ marginTop: 20 }} />
+        ) : (
+          <ContactsList
+            contacts={usersData?.users.data || []}
+            add={addedContact}
+            isAdd={isAdd}
+            isRemove={isRemove}
+            remove={removedContact}
+            endReached={onEndReached}
+          />
+        )}
       </Container>
     </View>
   );
