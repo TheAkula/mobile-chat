@@ -14,12 +14,12 @@ import { createClient } from "graphql-ws";
 import { AsyncStorageKey } from "src/constants";
 
 const httpLink = createHttpLink({
-  uri: "http://172.17.0.1:4000/graphql",
+  uri: "https://mobile-chat-backend.herokuapp.com/graphql",
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://172.17.0.1:4000/graphql",
+    url: "https://mobile-chat-backend.herokuapp.com/graphql",
     shouldRetry(errOrCloseEvent) {
       return true;
     },
